@@ -16,7 +16,7 @@
 <p align="center">
   <a href="#-what-is-imperium">WHAT IS</a> •
 	<a href="#-script">SCRIPT</a> •
-	<a href="#-premium">PREMIUM</a> •
+	<a href="#-premium-not-added-for-now">PREMIUM</a> •
 	<a href="https://discord.gg/">Discord server</a>
 </p>
 <br/>
@@ -57,7 +57,7 @@
 
 <br>
 
-## • PREMIUM
+## • PREMIUM (NOT ADDED FOR NOW)
 
 **_1. What's is the use?_**
 > Alert: With this you can use those commands on players that executed our script in your lobby/game.<br>
