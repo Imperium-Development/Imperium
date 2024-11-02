@@ -43,8 +43,6 @@ local angle = 1
 local radius = 10
 local angleSpeed = 2
 local blackHoleActive = false
-local solarSystemActive = false
-local objectsInSolarSystem = {}
 
 local function setupPlayer()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -91,7 +89,7 @@ if not getgenv().Network then
     EnablePartControl()
 end
 
-local function ForcePart(v)
+local function ForcePart(v, orbitRadius)
     if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
         for _, x in next, v:GetChildren() do
             if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
@@ -122,40 +120,23 @@ local function ForcePart(v)
     end
 end
 
-local function ForcePartSolarSystem(v)
-    if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
-        -- Verifica que solo sean partes unanchored
-        if not v.Anchored then
-            for _, x in next, v:GetChildren() do
-                if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
-                    x:Destroy()
-                end
-            end
-            
-            -- Asegúrate de que solo se añadan objetos no anclados
-            if not objectsInSolarSystem[v] then
-                objectsInSolarSystem[v] = { angle = math.random(0, 360), offset = math.random(3, 10) }
-            end
-        end
-    end
-end
-
 local function toggleBlackHole()
-    blackHoleActive = not blackHoleActive
     if blackHoleActive then
         for _, v in next, Workspace:GetDescendants() do
-            ForcePart(v)
+            local orbitRadius = radius + math.random(0, 50) -- Variar el radio para diferentes objetos
+            ForcePart(v, orbitRadius)
         end
 
         Workspace.DescendantAdded:Connect(function(v)
             if blackHoleActive then
-                ForcePart(v)
+                local orbitRadius = radius + math.random(0, 50) -- Variar el radio para nuevos objetos
+                ForcePart(v, orbitRadius)
             end
         end)
 
         spawn(function()
             while blackHoleActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(2)
+                angle = angle + math.rad(angleSpeed)
 
                 local offsetX = math.cos(angle) * radius
                 local offsetZ = math.sin(angle) * radius
@@ -168,45 +149,10 @@ local function toggleBlackHole()
     end
 end
 
-local function toggleSolarSystem()
-    solarSystemActive = not solarSystemActive
-    if solarSystemActive then
-        for _, v in next, Workspace:GetDescendants() do
-            ForcePartSolarSystem(v)
-        end
-
-        Workspace.DescendantAdded:Connect(function(v)
-            if solarSystemActive then
-                ForcePartSolarSystem(v)
-            end
-        end)
-
-        spawn(function()
-            while solarSystemActive and RunService.RenderStepped:Wait() do
-                for part, data in pairs(objectsInSolarSystem) do
-                    -- Actualiza el ángulo de rotación
-                    data.angle = data.angle + math.rad(angleSpeed)
-                    local offsetX = math.cos(data.angle) * (radius + data.offset)
-                    local offsetZ = math.sin(data.angle) * (radius + data.offset)
-                    
-                    -- Establece la nueva posición del objeto
-                    part.Position = humanoidRootPart.Position + Vector3.new(offsetX, 0, offsetZ)
-                end
-            end
-        end)
-    else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
-        objectsInSolarSystem = {} -- Limpiar la tabla cuando se desactiva
-    end
-end
-
 LocalPlayer.CharacterAdded:Connect(function()
     humanoidRootPart, Attachment1 = setupPlayer()
     if blackHoleActive then
         toggleBlackHole()
-    end
-    if solarSystemActive then
-        toggleSolarSystem()
     end
 end)
 
@@ -325,6 +271,7 @@ LocalPlayer.CharacterAdded:Connect(function()
         toggleBlackHole()
     end
 end)
+
 --]]
 
 -- [ TAB #1  -  HOME ] --
@@ -426,26 +373,15 @@ MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
 end)
  
 MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-    if value then
+    blackHoleActive = value
+    if blackHoleActive then
         toggleBlackHole()
-    else
-        blackHoleActive = false
-    end
-	--blackHoleActive = value
-    --if blackHoleActive then
-    --    toggleBlackHole()
-    --end
-end)
-
-MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-    if value then
-        toggleSolarSystem()
-    else
-        solarSystemActive = false
     end
 end)
 
---[[
+MainTAB:Toggle(" ・ Enable Ring BlackHole", false, function(value)
+end)
+
 spawn(function()
     while true do
         RunService.RenderStepped:Wait()
@@ -454,7 +390,6 @@ spawn(function()
         end
     end
 end)
---]]
 
 -- [ TAB #3  -  MOVEMENT ] --
 
