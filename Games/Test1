@@ -15,6 +15,7 @@ ImperiumLib:Notification("Notification", "Welcome to Imperium. Thanks for using 
 
 local HomeTAB = Windows:Tab("Home")
 local MainTAB = Windows:Tab("Main")
+local HoleTAB = Windows:Tab("BlackHole")
 local MovementTAB = Windows:Tab("Movement")
 local ModifyTAB = Windows:Tab("Modifications")
 local CreditsTAB = Windows:Tab("Credits")
@@ -37,192 +38,8 @@ local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration})
 end
 
--- [ BLACK HOLE FUCTION'S ] --
+-- [ BLACK HOLE FUCTION'S ] ---
 
-local angle = 1
-local radius = 10
-local angleSpeed = 2
-local blackHoleActive = false
-local solarSystemActive = false
-local objectsInSolarSystem = {}
-
-local function setupPlayer()
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-
-    local Folder = Instance.new("Folder", Workspace)
-    local Part = Instance.new("Part", Folder)
-    local Attachment1 = Instance.new("Attachment", Part)
-    Part.Anchored = true
-    Part.CanCollide = false
-    Part.Transparency = 1
-
-    return humanoidRootPart, Attachment1
-end
-
-local humanoidRootPart, Attachment1 = setupPlayer()
-
-if not getgenv().Network then
-    getgenv().Network = {
-        BaseParts = {},
-        Velocity = Vector3.new(14.46262424, 14.46262424, 14.46262424)
-    }
-
-    Network.RetainPart = function(part)
-        if typeof(part) == "Instance" and part:IsA("BasePart") and part:IsDescendantOf(Workspace) then
-            table.insert(Network.BaseParts, part)
-            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
-            part.CanCollide = false
-        end
-    end
-
-    local function EnablePartControl()
-        LocalPlayer.ReplicationFocus = Workspace
-        RunService.Heartbeat:Connect(function()
-            sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
-            for _, part in pairs(Network.BaseParts) do
-                if part:IsDescendantOf(Workspace) then
-                    part.Velocity = Network.Velocity
-                end
-            end
-        end)
-    end
-
-    EnablePartControl()
-end
-
-local function ForcePart(v)
-    if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
-        for _, x in next, v:GetChildren() do
-            if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
-                x:Destroy()
-            end
-        end
-        if v:FindFirstChild("Attachment") then
-            v:FindFirstChild("Attachment"):Destroy()
-        end
-        if v:FindFirstChild("AlignPosition") then
-            v:FindFirstChild("AlignPosition"):Destroy()
-        end
-        if v:FindFirstChild("Torque") then
-            v:FindFirstChild("Torque"):Destroy()
-        end
-        v.CanCollide = false
-
-        local Torque = Instance.new("Torque", v)
-        Torque.Torque = Vector3.new(1000000, 1000000, 1000000)
-        local AlignPosition = Instance.new("AlignPosition", v)
-        local Attachment2 = Instance.new("Attachment", v)
-        Torque.Attachment0 = Attachment2
-        AlignPosition.MaxForce = math.huge
-        AlignPosition.MaxVelocity = math.huge
-        AlignPosition.Responsiveness = 500
-        AlignPosition.Attachment0 = Attachment2
-        AlignPosition.Attachment1 = Attachment1
-    end
-end
-
-local function ForcePartSolarSystem(v)
-    if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
-        -- Verifica que no sea una parte anclada o un humanoide
-        if not v.Anchored then
-            for _, x in next, v:GetChildren() do
-                if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
-                    x:Destroy()
-                end
-            end
-            if not v:FindFirstChild("Attachment") then
-                local Attachment = Instance.new("Attachment", v)
-                Attachment.Name = "SolarAttachment"
-            end
-            if not v:FindFirstChild("AlignPosition") then
-                local AlignPosition = Instance.new("AlignPosition", v)
-                AlignPosition.Name = "SolarAlignPosition"
-                AlignPosition.MaxForce = math.huge
-                AlignPosition.MaxVelocity = math.huge
-                AlignPosition.Responsiveness = 500
-                AlignPosition.Attachment0 = v:FindFirstChild("SolarAttachment")
-                AlignPosition.Attachment1 = Attachment1
-            end
-            -- Almacena cada objeto en la tabla para su uso en el movimiento
-            if not objectsInSolarSystem[v] then
-                objectsInSolarSystem[v] = { angle = math.random(0, 360), offset = math.random(3, 10) }
-            end
-        end
-    end
-end
-
-local function toggleBlackHole()
-    blackHoleActive = not blackHoleActive
-    if blackHoleActive then
-        for _, v in next, Workspace:GetDescendants() do
-            ForcePart(v)
-        end
-
-        Workspace.DescendantAdded:Connect(function(v)
-            if blackHoleActive then
-                ForcePart(v)
-            end
-        end)
-
-        spawn(function()
-            while blackHoleActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(2)
-
-                local offsetX = math.cos(angle) * radius
-                local offsetZ = math.sin(angle) * radius
-
-                Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
-            end
-        end)
-    else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
-    end
-end
-
-local function toggleSolarSystem()
-    solarSystemActive = not solarSystemActive
-    if solarSystemActive then
-        for _, v in next, Workspace:GetDescendants() do
-            ForcePartSolarSystem(v)
-        end
-
-        Workspace.DescendantAdded:Connect(function(v)
-            if solarSystemActive then
-                ForcePartSolarSystem(v)
-            end
-        end)
-
-        spawn(function()
-            while solarSystemActive and RunService.RenderStepped:Wait() do
-                for part, data in pairs(objectsInSolarSystem) do
-                    -- Actualiza el ángulo de rotación
-                    data.angle = data.angle + math.rad(angleSpeed)
-                    local offsetX = math.cos(data.angle) * (radius + data.offset)
-                    local offsetZ = math.sin(data.angle) * (radius + data.offset)
-                    
-                    -- Establece la nueva posición del objeto
-                    part.Position = humanoidRootPart.Position + Vector3.new(offsetX, 0, offsetZ)
-                end
-            end
-        end)
-    else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
-        objectsInSolarSystem = {} -- Limpiar la tabla cuando se desactiva
-    end
-end
-
-LocalPlayer.CharacterAdded:Connect(function()
-    humanoidRootPart, Attachment1 = setupPlayer()
-    if blackHoleActive then
-        toggleBlackHole()
-    end
-    if solarSystemActive then
-        toggleSolarSystem()
-    end
-end)
-
---[[
 local angle = 1
 local radius = 10
 local angleSpeed = 2
@@ -318,7 +135,7 @@ local function toggleBlackHole()
 
         spawn(function()
             while blackHoleActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(2)
+                angle = angle + math.rad(angleSpeed) -- Aquí se usa angleSpeed
 
                 local offsetX = math.cos(angle) * radius
                 local offsetZ = math.sin(angle) * radius
@@ -337,7 +154,6 @@ LocalPlayer.CharacterAdded:Connect(function()
         toggleBlackHole()
     end
 end)
---]]
 
 -- [ TAB #1  -  HOME ] --
 
@@ -433,31 +249,23 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
-MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
+-- [ TAB #3  -  BLACKHOLE ] --
+
+HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
 	radius = value
 end)
+
+HoleTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value) 
+    angleSpeed = value
+end)
  
-MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-    if value then
+HoleTAB:Toggle(" ・ Enable BlackHole", false, function(value)
+    blackHoleActive = value
+    if blackHoleActive then
         toggleBlackHole()
-    else
-        blackHoleActive = false
-    end
-	--blackHoleActive = value
-    --if blackHoleActive then
-    --    toggleBlackHole()
-    --end
-end)
-
-MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-    if value then
-        toggleSolarSystem()
-    else
-        solarSystemActive = false
     end
 end)
 
---[[
 spawn(function()
     while true do
         RunService.RenderStepped:Wait()
@@ -466,9 +274,8 @@ spawn(function()
         end
     end
 end)
---]]
 
--- [ TAB #3  -  MOVEMENT ] --
+-- [ TAB #4  -  MOVEMENT ] --
 
 MovementTAB:Slider(" ・ Set WalkSpeed", 5, 200, 16, function(value)
 	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
@@ -482,7 +289,7 @@ MovementTAB:Slider(" ・ Set Gravity", 5, 1000, 196, function(value)
 	game.Players.LocalPlayer.Character.Humanoid.Gravity = value
 end)
 
--- [ TAB #4  -  MODIFICATIONS ] --
+-- [ TAB #5  -  MODIFICATIONS ] --
 
 ModifyTAB:ColorpickerAlways(" ・ Water Color", Color3.fromRGB(0, 170, 255), function(t)
 	local brickColor = BrickColor.new(t)
@@ -526,7 +333,7 @@ ModifyTAB:Button(" ・ Remove ADS", function()
     game:GetService("Workspace").ReturnPortal:Destroy()
 end)
 
--- [ TAB #5  -  CREDITS ] --
+-- [ TAB #6  -  CREDITS ] --
 CreditsTAB:Label("  >  Owner   :  @donfushii")
 CreditsTAB:Label("  >  Tester    :  @ImperiumClothes")
 
