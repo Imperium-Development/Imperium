@@ -37,12 +37,6 @@ local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration})
 end
 
--- [ FLY FUNCTION'S ] --
-
-local flySpeed = 50
-local flying = false
-local speeds = 1
-
 -- [ BLACK HOLE FUCTION'S ] --
 
 local angle = 1
@@ -191,6 +185,10 @@ end)
 
 -- [ TAB #2  -  MAIN ] --
 
+MainTAB:Button(" ・ Fly [I didn't want to do it]", function()
+	loadstring(game:HttpGet("https://pastebin.com/raw/eR4bgsRp"))()
+end)
+
 MainTAB:Button(" ・ Disable Fall Damage", function()
 	local runsvc = game:GetService("RunService")
     local heartbeat = runsvc.Heartbeat
@@ -249,94 +247,6 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	if not value then
 		event:Disconnect()
 	end
-end)
-
-MainTAB:Slider(" ・ Fly Speed", 1, 300, 50, function(value)
-    flySpeed = value
-end)
- 
-MainTAB:Toggle(" ・ Enable Fly", false, function(value)
-    flying = value
-    if flying then
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:WaitForChild("Humanoid")
-        local torso = character:WaitForChild("HumanoidRootPart")
-
-        local bg = Instance.new("BodyGyro", torso)
-        bg.P = 9e4
-        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-        bg.cframe = torso.CFrame
-
-        local bv = Instance.new("BodyVelocity", torso)
-        bv.velocity = Vector3.new(0, 0, 0)
-        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-
-        local ctrl = {f = 0, b = 0, l = 0, r = 0}
-        local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-        local maxspeed = flySpeed
-        local speed = 0
-
-        game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-            if not gameProcessed then
-                if input.KeyCode == Enum.KeyCode.W then
-                    ctrl.f = 1
-                elseif input.KeyCode == Enum.KeyCode.S then
-                    ctrl.b = -1
-                elseif input.KeyCode == Enum.KeyCode.A then
-                    ctrl.l = -1
-                elseif input.KeyCode == Enum.KeyCode.D then
-                    ctrl.r = 1
-                end
-            end
-        end)
-
-        game:GetService("UserInputService").InputEnded:Connect(function(input, gameProcessed)
-            if input.KeyCode == Enum.KeyCode.W then
-                ctrl.f = 0
-            elseif input.KeyCode == Enum.KeyCode.S then
-                ctrl.b = 0
-            elseif input.KeyCode == Enum.KeyCode.A then
-                ctrl.l = 0
-            elseif input.KeyCode == Enum.KeyCode.D then
-                ctrl.r = 0
-            end
-        end)
-
-        while flying do
-            wait()
-            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                speed = speed + .5 + (speed / maxspeed)
-                if speed > maxspeed then
-                    speed = maxspeed
-                end
-            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-                speed = speed - 1
-                if speed < 0 then
-                    speed = 0
-                end
-            end
-
-            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-                bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) +
-                ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) - 
-                game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
-                lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
-            else
-                bv.velocity = Vector3.new(0, 0, 0)
-            end
-
-            bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
-        end
-
-        ctrl = {f = 0, b = 0, l = 0, r = 0}
-        speed = 0
-        bg:Destroy()
-        bv:Destroy()
-    else
-        local player = game.Players.LocalPlayer
-        player.Character.Humanoid.PlatformStand = false
-    end
 end)
 
 MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
