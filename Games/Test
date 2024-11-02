@@ -45,8 +45,6 @@ local angleSpeed = 2
 local blackHoleActive = false
 local solarSystemActive = false
 local connectionDescendantAdded
-
--- Tabla para almacenar ángulos individuales para cada objeto en el sistema solar
 local objectAngles = {}
 
 local function setupPlayer()
@@ -128,17 +126,18 @@ end
 local function toggleBlackHole()
     blackHoleActive = not blackHoleActive
     if blackHoleActive then
+        -- Desactivar el sistema solar si está activo
+        solarSystemActive = false
+        objectAngles = {}  -- Limpiar ángulos para el modo de Sistema Solar
         for _, v in next, Workspace:GetDescendants() do
             ForcePart(v)
         end
 
-        if not connectionDescendantAdded then
-            connectionDescendantAdded = Workspace.DescendantAdded:Connect(function(v)
-                if blackHoleActive then
-                    ForcePart(v)
-                end
-            end)
-        end
+        connectionDescendantAdded = Workspace.DescendantAdded:Connect(function(v)
+            if blackHoleActive then
+                ForcePart(v)
+            end
+        end)
 
         spawn(function()
             while blackHoleActive do
@@ -163,6 +162,8 @@ end
 local function toggleSolarSystem()
     solarSystemActive = not solarSystemActive
     if solarSystemActive then
+        -- Desactivar el modo de Black Hole si está activo
+        blackHoleActive = false
         for i, part in ipairs(Network.BaseParts) do
             objectAngles[part] = math.rad(i * 30)  -- Separar ángulos de los objetos
         end
@@ -172,8 +173,6 @@ local function toggleSolarSystem()
                 wait(0.03)
                 for part, objAngle in pairs(objectAngles) do
                     objAngle = objAngle + math.rad(angleSpeed)
-
-                    -- Determinar radio específico para cada objeto
                     local objRadius = radius + (math.random() * 5)  -- Radio variado para cada objeto
 
                     local offsetX = math.cos(objAngle) * objRadius
@@ -419,23 +418,25 @@ MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
 end)
  
 MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-	blackHoleActive = value
-    if blackHoleActive then
+	if value then
         toggleBlackHole()
+    else
+        blackHoleActive = false
     end
 end)
 
 MainTAB:Toggle(" ・ Enable Ring BlackHole", false, function(value)
-    solarSystemActive = value
-    if solarSystemActive then
+    if value then
         toggleSolarSystem()
+    else
+        solarSystemActive = false
     end
 end)
 
 spawn(function()
     while true do
-        RunService.RenderStepped:Wait()
-        if blackHoleActive then
+        wait(0.1)
+        if blackHoleActive or solarSystemActive then
             angle = angle + math.rad(angleSpeed)
         end
     end
