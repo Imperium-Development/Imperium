@@ -37,126 +37,122 @@ local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration})
 end
 
--- [ BLACK HOLE FUCTION'S ] --
+-- [ BLACK HOLE FUCTION'S #1 ] --
 
-local angle = 1
-local radius = 10
-local angleSpeed = 2
-local blackHoleActive = false
+local character
+local humanoidRootPart
 
-local function setupPlayer()
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local blackHoleActive1 = false
+local player = nil
+local Attachment1
 
-    local Folder = Instance.new("Folder", Workspace)
-    local Part = Instance.new("Part", Folder)
-    local Attachment1 = Instance.new("Attachment", Part)
-    Part.Anchored = true
-    Part.CanCollide = false
-    Part.Transparency = 1
-
-    return humanoidRootPart, Attachment1
-end
-
-local humanoidRootPart, Attachment1 = setupPlayer()
+local Folder1 = Instance.new("Folder", Workspace)
+local Part1 = Instance.new("Part", Folder1)
+Attachment1 = Instance.new("Attachment", Part1)
+Part1.Anchored = true
+Part1.CanCollide = false
+Part1.Transparency = 1
 
 if not getgenv().Network then
-    getgenv().Network = {
-        BaseParts = {},
-        Velocity = Vector3.new(14.46262424, 14.46262424, 14.46262424)
-    }
+	getgenv().Network = {
+		BaseParts = {},
+		Velocity = Vector3.new(14.46262424, 14.46262424, 14.46262424)
+	}
 
-    Network.RetainPart = function(part)
-        if typeof(part) == "Instance" and part:IsA("BasePart") and part:IsDescendantOf(Workspace) then
-            table.insert(Network.BaseParts, part)
-            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
-            part.CanCollide = false
-        end
-    end
+	Network.RetainPart = function(Part1)
+		if Part1:IsA("BasePart") and Part1:IsDescendantOf(Workspace) then
+			table.insert(Network.BaseParts, Part1)
+			Part1.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
+			Part1.CanCollide = false
+		end
+	end
 
-    local function EnablePartControl()
-        LocalPlayer.ReplicationFocus = Workspace
-        RunService.Heartbeat:Connect(function()
-            sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
-            for _, part in pairs(Network.BaseParts) do
-                if part:IsDescendantOf(Workspace) then
-                    part.Velocity = Network.Velocity
-                end
-            end
-        end)
-    end
+	local function EnablePartControl()
+		LocalPlayer.ReplicationFocus = Workspace
+		RunService.Heartbeat:Connect(function()
+			sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
+			for _, Part1 in pairs(Network.BaseParts) do
+				if Part1:IsDescendantOf(Workspace) then
+					Part1.Velocity = Network.Velocity
+				end
+			end
+		end)
+	end
 
-    EnablePartControl()
+	EnablePartControl()
 end
 
-local function ForcePart(v, orbitRadius)
-    if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
-        for _, x in next, v:GetChildren() do
-            if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
-                x:Destroy()
-            end
-        end
-        if v:FindFirstChild("Attachment") then
-            v:FindFirstChild("Attachment"):Destroy()
-        end
-        if v:FindFirstChild("AlignPosition") then
-            v:FindFirstChild("AlignPosition"):Destroy()
-        end
-        if v:FindFirstChild("Torque") then
-            v:FindFirstChild("Torque"):Destroy()
-        end
-        v.CanCollide = false
-
-        local Torque = Instance.new("Torque", v)
-        Torque.Torque = Vector3.new(1000000, 1000000, 1000000)
-        local AlignPosition = Instance.new("AlignPosition", v)
-        local Attachment2 = Instance.new("Attachment", v)
-        Torque.Attachment0 = Attachment2
-        AlignPosition.MaxForce = math.huge
-        AlignPosition.MaxVelocity = math.huge
-        AlignPosition.Responsiveness = 500
-        AlignPosition.Attachment0 = Attachment2
-        AlignPosition.Attachment1 = Attachment1
-    end
+local function ForcePart1(v)
+	if v:IsA("BasePart") and not v.Anchored and not v.Parent:FindFirstChildOfClass("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
+		for _, x in ipairs(v:GetChildren()) do
+			if x:IsA("BodyMover") or x:IsA("RocketPropulsion") then
+				x:Destroy()
+			end
+		end
+		if v:FindFirstChild("Attachment") then
+			v:FindFirstChild("Attachment"):Destroy()
+		end
+		if v:FindFirstChild("AlignPosition") then
+			v:FindFirstChild("AlignPosition"):Destroy()
+		end
+		if v:FindFirstChild("Torque") then
+			v:FindFirstChild("Torque"):Destroy()
+		end
+		v.CanCollide = false
+		local Torque = Instance.new("Torque", v)
+		Torque.Torque = Vector3.new(100000, 100000, 100000)
+		local AlignPosition = Instance.new("AlignPosition", v)
+		local Attachment2 = Instance.new("Attachment", v)
+		Torque.Attachment0 = Attachment2
+		AlignPosition.MaxForce = math.huge
+		AlignPosition.MaxVelocity = math.huge
+		AlignPosition.Responsiveness = 200
+		AlignPosition.Attachment0 = Attachment2
+		AlignPosition.Attachment1 = Attachment1
+	end
 end
 
-local function toggleBlackHole()
-    if blackHoleActive then
-        for _, v in next, Workspace:GetDescendants() do
-            local orbitRadius = radius + math.random(0, 50) -- Variar el radio para diferentes objetos
-            ForcePart(v, orbitRadius)
-        end
+local DescendantAddedConnection
 
-        Workspace.DescendantAdded:Connect(function(v)
-            if blackHoleActive then
-                local orbitRadius = radius + math.random(0, 50) -- Variar el radio para nuevos objetos
-                ForcePart(v, orbitRadius)
-            end
-        end)
+local function toggleBlackHole1()
+	blackHoleActive1 = not blackHoleActive1
+	if blackHoleActive1 then
+		for _, v in ipairs(Workspace:GetDescendants()) do
+			ForcePart1(v)
+		end
 
-        spawn(function()
-            while blackHoleActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(angleSpeed)
+		DescendantAddedConnection = Workspace.DescendantAdded:Connect(function(v)
+			if blackHoleActive1 then
+				ForcePart1(v)
+			end
+		end)
 
-                local offsetX = math.cos(angle) * radius
-                local offsetZ = math.sin(angle) * radius
-
-                Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
-            end
-        end)
-    else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
-    end
+		spawn(function()
+			while blackHoleActive1 and RunService.RenderStepped:Wait() do
+				Attachment1.WorldCFrame = humanoidRootPart.CFrame
+			end
+		end)
+	else
+		if DescendantAddedConnection then
+			DescendantAddedConnection:Disconnect()
+		end
+	end
 end
 
-LocalPlayer.CharacterAdded:Connect(function()
-    humanoidRootPart, Attachment1 = setupPlayer()
-    if blackHoleActive then
-        toggleBlackHole()
-    end
-end)
+local function getPlayer(name)
+	local lowerName = string.lower(name)
+	for _, p in pairs(Players:GetPlayers()) do
+		local lowerPlayer = string.lower(p.Name)
+		if string.find(lowerPlayer, lowerName) then
+			return p
+		elseif string.find(string.lower(p.DisplayName), lowerName) then
+			return p
+		end
+	end
+end
 
---[[
+-- [ BLACK HOLE FUCTION'S #2 ] --
+
 local angle = 1
 local radius = 10
 local angleSpeed = 2
@@ -272,8 +268,6 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
---]]
-
 -- [ TAB #1  -  HOME ] --
 
 HomeTAB:LabelModify(" ・ Game Time: ", function()
@@ -379,7 +373,24 @@ MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
     end
 end)
 
-MainTAB:Toggle(" ・ Enable Ring BlackHole", false, function(value)
+MainTAB:Textbox(" ・ Set Player", true, function(t)
+    player = getPlayer(t)
+	if player then
+		MainTAB:Textbox(" ・ Set Player", true, function() end)
+		print("Player found:", player.Name)
+	else
+		print("Player not found")
+	end
+end)
+
+MainTAB:Toggle(" ・ Bring Parts To Player", false, function(value)
+    if player then
+		character = player.Character or player.CharacterAdded:Wait()
+		humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+		toggleBlackHole1()
+	else
+		print("Player is not selected")
+	end
 end)
 
 spawn(function()
