@@ -48,7 +48,7 @@
 
 ]]--
 
->  loadstring(game:HttpGet(""))()
+>  loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/Imperium.lua"))()
 ```
 
 <div align="center">
