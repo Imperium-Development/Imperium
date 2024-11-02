@@ -187,10 +187,11 @@ local function toggleSolarSystem()
 
         spawn(function()
             while solarSystemActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(2)
+                angle = angle + math.rad(angleSpeed)
 
-                local offsetX = math.cos(angle) * radius
-                local offsetZ = math.sin(angle) * radius
+                -- Modificación para dispersar objetos
+                local offsetX = math.cos(angle) * (radius + math.random(-5, 5)) -- Añadir variación aleatoria
+                local offsetZ = math.sin(angle) * (radius + math.random(-5, 5)) -- Añadir variación aleatoria
 
                 Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
             end
