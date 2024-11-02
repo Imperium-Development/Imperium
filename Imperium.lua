@@ -1,4 +1,57 @@
-   -- [ ZOMBIE ATTACK ] --
+-- 404: Not Found
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- [ ZOMBIE ATTACK ] --
 if game.PlaceId == 1240123653 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/Games/Zombie%20Attack.lua"))()
 
