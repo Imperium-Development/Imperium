@@ -51,6 +51,11 @@ local animationController
 local flyingAnim
 local flyingAnimTrack
 
+local animationController
+local flyingAnim
+local flyingAnimTrack
+
+-- Función para reproducir animación
 local function PlayAnim(animId, priority, loopCount)
     if not animationController then
         animationController = LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):FindFirstChild("Animator") or Instance.new("Animator", LocalPlayer.Character:FindFirstChildOfClass("Humanoid"))
@@ -62,6 +67,7 @@ local function PlayAnim(animId, priority, loopCount)
     flyingAnimTrack:Play(0, 1, loopCount)
 end
 
+-- Función para detener animación
 local function StopAnim(animId)
     if flyingAnimTrack then
         flyingAnimTrack:Stop()
@@ -73,8 +79,10 @@ local function Fly()
     local UpperTorso = LocalPlayer.Character:FindFirstChild("UpperTorso") or LocalPlayer.Character:FindFirstChild("Torso")
     if not UpperTorso then return end
 
+    -- Detectar tipo de rig (R6 o R15)
     isR15 = LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R15
 
+    -- Crear elementos de vuelo
     local bg = Instance.new("BodyGyro", UpperTorso)
     bg.P = 9e4
     bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
@@ -84,8 +92,9 @@ local function Fly()
     bv.velocity = Vector3.new(0, 0.1, 0)
     bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
 
+    -- Activar animación en R15
     if isR15 then
-        PlayAnim(10714347256, Enum.AnimationPriority.Action, 0) 
+        PlayAnim(10714347256, Enum.AnimationPriority.Action, 0)  -- ID de animación de vuelo en R15
     end
 
     FlyLoop = RunService.RenderStepped:Connect(function()
@@ -122,6 +131,7 @@ local function StopFly()
         end
     end
 
+    -- Detener animación en R15
     if isR15 then
         StopAnim(10714347256)
     end
@@ -130,6 +140,7 @@ local function StopFly()
     ctrl, lastctrl, speed = {f = 0, b = 0, l = 0, r = 0}, {f = 0, b = 0, l = 0, r = 0}, 0
 end
 
+-- Detectar controles de teclado
 local KeyDownFunction
 local KeyUpFunction
 
@@ -147,6 +158,47 @@ KeyUpFunction = UserInputService.InputEnded:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.S then ctrl.b = 0 end
     if input.KeyCode == Enum.KeyCode.A then ctrl.l = 0 end
     if input.KeyCode == Enum.KeyCode.D then ctrl.r = 0 end
+end)
+
+-- Detectar toques en dispositivos móviles
+local touchStartFunction
+local touchEndFunction
+
+touchStartFunction = UserInputService.TouchStarted:Connect(function(touch, gameProcessedEvent)
+    if not gameProcessedEvent then
+        local touchPosition = touch.Position
+        -- Configurar controles táctiles
+        if touchPosition.Y < workspace.CurrentCamera.ViewportSize.Y / 2 then -- Toque en la parte inferior
+            if touchPosition.X < workspace.CurrentCamera.ViewportSize.X / 2 then -- Izquierda
+                ctrl.l = -1
+            else -- Derecha
+                ctrl.r = 1
+            end
+        else -- Toque en la parte superior
+            if touchPosition.X < workspace.CurrentCamera.ViewportSize.X / 2 then -- Adelante
+                ctrl.f = 1
+            else -- Atrás
+                ctrl.b = -1
+            end
+        end
+    end
+end)
+
+touchEndFunction = UserInputService.TouchEnded:Connect(function(touch)
+    -- Restablecer controles táctiles
+    if touch.Position.Y < workspace.CurrentCamera.ViewportSize.Y / 2 then -- Toque en la parte inferior
+        if touch.Position.X < workspace.CurrentCamera.ViewportSize.X / 2 then -- Izquierda
+            ctrl.l = 0
+        else -- Derecha
+            ctrl.r = 0
+        end
+    else -- Toque en la parte superior
+        if touch.Position.X < workspace.CurrentCamera.ViewportSize.X / 2 then -- Adelante
+            ctrl.f = 0
+        else -- Atrás
+            ctrl.b = 0
+        end
+    end
 end)
 
 -- [ BLACK HOLE FUCTION'S ] --
