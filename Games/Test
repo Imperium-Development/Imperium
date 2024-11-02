@@ -155,6 +155,37 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
+-- [ NOCLIP FUNCTION'S ] --
+
+local noclipEnabled = false
+local Stepped
+
+local function toggleNoclip(value)
+    noclipEnabled = value
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+    if noclipEnabled then
+        Stepped = RunService.Stepped:Connect(function()
+            for _, part in pairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+    else
+        if Stepped then
+            Stepped:Disconnect()
+            Stepped = nil
+        end
+
+        for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
 -- [ TAB #1  -  HOME ] --
 
 HomeTAB:LabelModify(" ・ Game Time: ", function()
@@ -275,32 +306,8 @@ spawn(function()
     end
 end)
 
-local noclipEnabled = false
-local Stepped
-
 HoleTAB:Toggle(" ・ Enable Noclip", false, function(value)
-    noclipEnabled = value
-    if noclipEnabled then
-        Stepped = RunService.Stepped:Connect(function()
-            if noclipEnabled then
-                local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-                for _, part in pairs(character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            else
-                if Stepped then
-                    Stepped:Disconnect()
-                end
-            end
-        end)
-    else
-        noclipEnabled = false
-        if Stepped then
-            Stepped:Disconnect()
-        end
-    end
+    toggleNoclip(value)
 end)
 
 LocalPlayer.CharacterAdded:Connect(function()
@@ -308,7 +315,7 @@ LocalPlayer.CharacterAdded:Connect(function()
         local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
         for _, part in pairs(character:GetDescendants()) do
             if part:IsA("BasePart") then
-                part.CanCollide = false
+                part.CanCollide = false 
             end
         end
     end
