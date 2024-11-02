@@ -39,88 +39,9 @@ end
 
 -- [ FLY FUNCTION'S ] --
 
-FLYING = false
-iyflyspeed = 50 -- Velocidad de vuelo inicial
-
-function sFLY()
-    repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    
-    local T = getRoot(Players.LocalPlayer.Character)
-    local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-    local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-    local SPEED = 0
-
-    local BG = Instance.new('BodyGyro', T)
-    local BV = Instance.new('BodyVelocity', T)
-    BG.P = 9e4
-    BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-    BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-
-    task.spawn(function()
-        repeat wait()
-            BG.CFrame = workspace.CurrentCamera.CFrame
-            
-            if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
-                SPEED = iyflyspeed -- Actualiza la velocidad usando el slider
-                BV.Velocity = ((workspace.CurrentCamera.CFrame.LookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CFrame.p)) * SPEED
-            else
-                BV.Velocity = Vector3.new(0, 0, 0)
-            end
-        until not FLYING
-
-        CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-        lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-        SPEED = 0
-        BG:Destroy()
-        BV:Destroy()
-        if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-            Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-        end
-    end)
-    
-    -- Conectar las teclas para controlar el vuelo
-    flyKeyDown = IYMouse.KeyDown:Connect(function(KEY)
-        if KEY:lower() == 'w' then
-            CONTROL.F = iyflyspeed
-        elseif KEY:lower() == 's' then
-            CONTROL.B = -iyflyspeed
-        elseif KEY:lower() == 'a' then
-            CONTROL.L = -iyflyspeed
-        elseif KEY:lower() == 'd' then 
-            CONTROL.R = iyflyspeed
-        elseif QEfly and KEY:lower() == 'e' then
-            CONTROL.Q = iyflyspeed * 2
-        elseif QEfly and KEY:lower() == 'q' then
-            CONTROL.E = -iyflyspeed * 2
-        end
-    end)
-    
-    flyKeyUp = IYMouse.KeyUp:Connect(function(KEY)
-        if KEY:lower() == 'w' then
-            CONTROL.F = 0
-        elseif KEY:lower() == 's' then
-            CONTROL.B = 0
-        elseif KEY:lower() == 'a' then
-            CONTROL.L = 0
-        elseif KEY:lower() == 'd' then
-            CONTROL.R = 0
-        elseif KEY:lower() == 'e' then
-            CONTROL.Q = 0
-        elseif KEY:lower() == 'q' then
-            CONTROL.E = 0
-        end
-    end)
-    
-    FLYING = true
-end
-
-function NOFLY()
-    FLYING = false
-    if flyKeyDown or flyKeyUp then flyKeyDown:Disconnect() flyKeyUp:Disconnect() end
-    if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-        Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-    end
-end
+local flySpeed = 50
+local flying = false
+local speeds = 1
 
 -- [ BLACK HOLE FUCTION'S ] --
 
@@ -331,14 +252,90 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 end)
 
 MainTAB:Slider(" ・ Fly Speed", 1, 300, 50, function(value)
-    iyflyspeed = value
+    flySpeed = value
 end)
  
 MainTAB:Toggle(" ・ Enable Fly", false, function(value)
-    if value then
-        sFLY()
+    flying = value
+
+    if flying then
+        local plr = game.Players.LocalPlayer
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        local torso = (char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso"))
+        
+        local bg = Instance.new("BodyGyro", torso)
+        bg.P = 9e4
+        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+        
+        local bv = Instance.new("BodyVelocity", torso)
+        bv.velocity = Vector3.new(0, 0.1, 0)
+        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+        
+        plr.Character.Humanoid.PlatformStand = true
+        
+        local ctrl = {f = 0, b = 0, l = 0, r = 0}
+        local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+        local speed = 0
+        
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if flying then
+                if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                    speed = speed + .5 + (speed / flySpeed)
+                    if speed > flySpeed then
+                        speed = flySpeed
+                    end
+                elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                    speed = speed - 1
+                    if speed < 0 then
+                        speed = 0
+                    end
+                end
+                
+                if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                    bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) +
+                        ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+                    lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                else
+                    bv.velocity = Vector3.new(0, 0, 0)
+                end
+                bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / flySpeed), 0, 0)
+            else
+                bv:Destroy()
+                bg:Destroy()
+                plr.Character.Humanoid.PlatformStand = false
+            end
+        end)
     else
-        NOFLY() 
+        bv:Destroy()
+        bg:Destroy()
+        plr.Character.Humanoid.PlatformStand = false
+    end
+end)
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed then
+        if input.KeyCode == Enum.KeyCode.W then
+            ctrl.f = 1
+        elseif input.KeyCode == Enum.KeyCode.S then
+            ctrl.b = -1
+        elseif input.KeyCode == Enum.KeyCode.A then
+            ctrl.l = -1
+        elseif input.KeyCode == Enum.KeyCode.D then
+            ctrl.r = 1
+        end
+    end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.W then
+        ctrl.f = 0
+    elseif input.KeyCode == Enum.KeyCode.S then
+        ctrl.b = 0
+    elseif input.KeyCode == Enum.KeyCode.A then
+        ctrl.l = 0
+    elseif input.KeyCode == Enum.KeyCode.D then
+        ctrl.r = 0
+    end
 end)
 
 MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
