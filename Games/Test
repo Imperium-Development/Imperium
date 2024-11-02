@@ -44,6 +44,7 @@ local radius = 10
 local angleSpeed = 2
 local blackHoleActive = false
 local solarSystemActive = false
+local objectsInSolarSystem = {}
 
 local function setupPlayer()
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -141,6 +142,10 @@ local function ForcePartSolarSystem(v)
             AlignPosition.Attachment0 = v:FindFirstChild("SolarAttachment")
             AlignPosition.Attachment1 = Attachment1
         end
+        -- Almacena cada objeto en la tabla para su uso en el movimiento
+        if not objectsInSolarSystem[v] then
+            objectsInSolarSystem[v] = { angle = math.random(0, 360), offset = math.random(3, 10) }
+        end
     end
 end
 
@@ -187,17 +192,20 @@ local function toggleSolarSystem()
 
         spawn(function()
             while solarSystemActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(angleSpeed)
-
-                -- Modificación para dispersar objetos
-                local offsetX = math.cos(angle) * (radius + math.random(-5, 5)) -- Añadir variación aleatoria
-                local offsetZ = math.sin(angle) * (radius + math.random(-5, 5)) -- Añadir variación aleatoria
-
-                Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
+                for part, data in pairs(objectsInSolarSystem) do
+                    -- Actualiza el ángulo de rotación
+                    data.angle = data.angle + math.rad(angleSpeed)
+                    local offsetX = math.cos(data.angle) * (radius + data.offset)
+                    local offsetZ = math.sin(data.angle) * (radius + data.offset)
+                    
+                    -- Establece la nueva posición del objeto
+                    part.Position = humanoidRootPart.Position + Vector3.new(offsetX, 0, offsetZ)
+                end
             end
         end)
     else
         Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
+        objectsInSolarSystem = {} -- Limpiar la tabla cuando se desactiva
     end
 end
 
