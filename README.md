@@ -35,7 +35,7 @@
 ## • SCRIPT
 
 <div align="center">
-	
+
 ```lua
 --[[
 
@@ -50,7 +50,6 @@
 
 loadstring(game:HttpGet(""))()
 ```
-
 </div>
 
 <br>
