@@ -5,10 +5,22 @@
 -->
 
 <p align="center">
-    <a align="center"></a>
-    <a align="center">- What is Imperium? -</a>
-    <a align="center"></a>
+	<a href="https://discord.gg/"><img src=".assets/icon.ico" alt="Imperium" height="90" /></a>
 </p>
+
+<h4 align="center">IMPERIUM | SCRIPT</h4>
+<p align="center">
+	V2.2.4
+</p>
+
+<p align="center">
+  <a href="#-what-is-imperium">WHAT IS</a> •
+	<a href="#-faq">FAQ</a> •
+	<a href="https://discord.gg/">Discord server</a>
+</p>
+<br/>
+
+## • WHAT IS IMPERIUM?
 
 ✔️・**Imperium** is a free tool for Roblox to have fun or to have fun with your friends.<br>
 ⚠・**Alert:** Imperium was developed solely for **EDUCATIONAL PURPOSES**.
