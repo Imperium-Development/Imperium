@@ -186,6 +186,7 @@ end
 local FlySpeed = 50
 local mouse = LocalPlayer:GetMouse()
 local ImperiumPad = Instance.new("ScreenGui")
+ImperiumPad.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local function PlayAnim(id,time,speed)
     pcall(function()
@@ -271,7 +272,6 @@ FlyDButton.Size = UDim2.new(0, 30, 0, 40)
 
 local flying = false
 local ctrl = {f = 0, b = 0, l = 0, r = 0}
-local lastctrl = {f = 0, b = 0, l = 0, r = 0}
 
 --[[
 local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -526,40 +526,45 @@ mouse.KeyUp:Connect(function(key)
 end)
 
 FlyWButton.MouseButton1Down:Connect(function()
-    ctrl.f = 1
+    keypress("0x57")
 end)
 
 FlyWButton.MouseButton1Up:Connect(function()
-    ctrl.f = 0
+    keyrelease("0x57")
 end)
 
 FlySButton.MouseButton1Down:Connect(function()
-    ctrl.b = -1
+    keypress("0x53")
 end)
 
 FlySButton.MouseButton1Up:Connect(function()
-    ctrl.b = 0
+    keyrelease("0x53")
 end)
 
 FlyAButton.MouseButton1Down:Connect(function()
-    ctrl.l = -1
+    keypress("0x41")
 end)
 
 FlyAButton.MouseButton1Up:Connect(function()
-    ctrl.l = 0
+    keyrelease("0x41")
 end)
 
 FlyDButton.MouseButton1Down:Connect(function()
-    ctrl.r = 1
+    keypress("0x44")
 end)
 
 FlyDButton.MouseButton1Up:Connect(function()
-    ctrl.r = 0
+    keyrelease("0x44")
 end)
 
 HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
     FlySpeed = value
     --speed = value
+end)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    flying = false
+    Fly_Pad.Visible = false
 end)
 
 game.Players.LocalPlayer.CharacterRemoving:Connect(function()
