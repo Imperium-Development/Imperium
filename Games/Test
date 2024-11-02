@@ -41,7 +41,7 @@ end
 
 local FLYING = false
 local QEfly = true
-local iyflyspeed = 7
+local iyflyspeed = 50
 
 local function getRoot(character)
     return character and character:FindFirstChild("HumanoidRootPart") or nil
@@ -51,7 +51,6 @@ local function sFLY(vfly)
     repeat wait() until Players.LocalPlayer and Players.LocalPlayer.Character and getRoot(Players.LocalPlayer.Character) and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
     local T = getRoot(Players.LocalPlayer.Character)
     local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-    local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
     local SPEED = 0
 
     local function FLY()
@@ -127,8 +126,9 @@ local function sFLY(vfly)
     FLY()
 end
 
-local function mobileFly(speaker)
-    local character = speaker.Character
+local function mobileFly()
+    local player = Players.LocalPlayer
+    local character = player.Character
     if not character then return end
 
     FLYING = true
@@ -146,28 +146,29 @@ local function mobileFly(speaker)
     bg.MaxTorque = v3inf
     bg.P = 1000
 
-    RunService.RenderStepped:Connect(function()
+    local function onTouchInput(touch)
         if FLYING then
-            bg.CFrame = camera.CoordinateFrame
-
             local moveDirection = Vector3.new(0, 0, 0)
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                moveDirection = moveDirection + camera.CFrame.LookVector
-            end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                moveDirection = moveDirection - camera.CFrame.LookVector
-            end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                moveDirection = moveDirection - camera.CFrame.RightVector
-            end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                moveDirection = moveDirection + camera.CFrame.RightVector
-            end
+            if touch.UserInputType == Enum.UserInputType.Touch then
+                local touchLocation = touch.Position
+                local screenCenter = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                local delta = (touchLocation - screenCenter)
 
-            bv.Velocity = moveDirection.Unit * iyflyspeed * 50
+                moveDirection = Vector3.new(delta.X, 0, delta.Y).unit
+                bv.Velocity = (camera.CFrame.LookVector * moveDirection.Z + camera.CFrame.RightVector * moveDirection.X) * iyflyspeed
+                bg.CFrame = camera.CFrame
+            end
         else
             bv:Destroy()
             bg:Destroy()
+        end
+    end
+
+    UserInputService.TouchStarted:Connect(onTouchInput)
+
+    RunService.RenderStepped:Connect(function()
+        if FLYING then
+            bg.CFrame = camera.CoordinateFrame
         end
     end)
 end
@@ -387,19 +388,19 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
-MainTAB:Slider(" ・ Fly Speed", 1, 300, 7, function(value)
+MainTAB:Slider(" ・ Fly Speed", 1, 300, 50, function(value)
     iyflyspeed = value
 end)
  
 MainTAB:Toggle(" ・ Enable Fly", false, function(value)
     if value then
-        if not game.Players.LocalPlayer.PlayerScripts:FindFirstChild("MobileControlModule") then
-            sFLY(false)
+        if UserInputService.TouchEnabled then
+            mobileFly()
         else
-            mobileFly(Players.LocalPlayer) 
+            sFLY(false) 
         end
     else
-        NOFLY()
+        NOFLY() 
     end
 end)
 
