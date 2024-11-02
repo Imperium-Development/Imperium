@@ -275,6 +275,40 @@ spawn(function()
     end
 end)
 
+local Clipon = false
+local Stepped
+
+HoleTAB:Toggle(" ・ Enable Noclip", false, function(value)
+    if value then
+		Clipon = true
+		Stepped = game:GetService("RunService").Stepped:Connect(function()
+			if Clipon then
+				for _, b in pairs(Workspace:GetChildren()) do
+					if b.Name == LocalPlayer.Name then
+						for _, v in pairs(Workspace[LocalPlayer.Name]:GetChildren()) do
+							if v:IsA("BasePart") then
+								v.CanCollide = false
+							end
+						end
+					end
+				end
+			end
+		end)
+	else
+		Clipon = false
+		if Stepped then
+			Stepped:Disconnect()
+		end
+	end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+	Clipon = false
+	if Stepped then
+		Stepped:Disconnect()
+	end
+end)
+
 -- [ TAB #4  -  MOVEMENT ] --
 
 MovementTAB:Slider(" ・ Set WalkSpeed", 5, 200, 16, function(value)
