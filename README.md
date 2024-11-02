@@ -51,6 +51,10 @@
 >  loadstring(game:HttpGet(""))()
 ```
 
+<div align="center">
+  <a href="https://discord.com/users/1226985025224970261" target="_blank"><img src="https://img.shields.io/badge/Script_Founder-donfushii-blue">
+</div>
+
 <br>
 
 ## • PREMIUM
