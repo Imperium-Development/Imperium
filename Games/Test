@@ -121,7 +121,6 @@ local function ForcePart(v)
 end
 
 local function toggleBlackHole()
-    blackHoleActive = not blackHoleActive
     if blackHoleActive then
         for _, v in next, Workspace:GetDescendants() do
             ForcePart(v)
@@ -254,11 +253,10 @@ MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
 end)
  
 MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-	if value then
-		toggleBlackHole()
-	else
-		blackHoleActive = false
-	end
+	blackHoleActive = value
+    if blackHoleActive then
+        toggleBlackHole()
+    end
 end)
 
 spawn(function()
