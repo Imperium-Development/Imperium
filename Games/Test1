@@ -157,34 +157,105 @@ end)
 
 -- [ NOCLIP FUNCTION'S ] --
 
-local noclipEnabled = false
-local Stepped
+-- [ FLY FUNCTION'S ] --
 
-local function toggleNoclip(value)
-    noclipEnabled = value
-    if noclipEnabled then
-        Stepped = RunService.Stepped:Connect(function()
-            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-            for _, part in pairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
+local speeds = 50
+local flying = false
+
+function startFlying()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local torso = char:FindFirstChild("HumanoidRootPart")
+    if not torso then return end
+
+    local bg = Instance.new("BodyGyro", torso)
+    bg.P = 9e4
+    bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.CFrame = torso.CFrame
+
+    local bv = Instance.new("BodyVelocity", torso)
+    bv.Velocity = Vector3.new(0, 0.1, 0)
+    bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+
+    local ctrl = {f = 0, b = 0, l = 0, r = 0}
+    local lastCtrl = {f = 0, b = 0, l = 0, r = 0}
+    local speed = 0
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if not flying then return end
+
+        -- Control del vuelo
+        if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+            speed = speed + 0.5 + (speed / speeds)
+            if speed > speeds then
+                speed = speeds
             end
-        end)
-    else
-        if Stepped then
-            Stepped:Disconnect()
-            Stepped = nil
+        else
+            speed = speed - 1
+            if speed < 0 then
+                speed = 0
+            end
         end
 
-        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
-        end
+        bv.Velocity = ((workspace.CurrentCamera.CFrame.LookVector * (ctrl.f + ctrl.b)) + ((workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) - workspace.CurrentCamera.CFrame.p)) * speed
+
+        bg.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / speeds), 0, 0)
+    end)
+end
+
+function stopFlying()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local torso = char:FindFirstChild("HumanoidRootPart")
+    if torso then
+        torso.BodyGyro:Destroy()
+        torso.BodyVelocity:Destroy()
     end
 end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.W then
+            ctrl.f = 1
+        elseif input.KeyCode == Enum.KeyCode.S then
+            ctrl.b = -1
+        elseif input.KeyCode == Enum.KeyCode.A then
+            ctrl.l = -1
+        elseif input.KeyCode == Enum.KeyCode.D then
+            ctrl.r = 1
+        end
+    end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.W then
+            ctrl.f = 0
+        elseif input.KeyCode == Enum.KeyCode.S then
+            ctrl.b = 0
+        elseif input.KeyCode == Enum.KeyCode.A then
+            ctrl.l = 0
+        elseif input.KeyCode == Enum.KeyCode.D then
+            ctrl.r = 0
+        end
+    end
+end)
+
+local UIS = game:GetService("UserInputService")
+UIS.TouchStarted:Connect(function(touch, gameProcessedEvent)
+    if not gameProcessedEvent and flying then
+        local touchPos = touch.Position
+    end
+end)
+
+UIS.TouchEnded:Connect(function(touch, gameProcessedEvent)
+    if not gameProcessedEvent and flying then
+    end
+end)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    if flying then
+        stopFlying()
+    end
+end)
 
 -- [ TAB #1  -  HOME ] --
 
@@ -306,19 +377,51 @@ spawn(function()
     end
 end)
 
-HoleTAB:Toggle(" ・ Enable Noclip", false, function(value)
-    toggleNoclip(value)
+HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
+    speeds = value
 end)
 
-LocalPlayer.CharacterAdded:Connect(function()
-    if noclipEnabled then
-        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
+HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
+    flying = value
+    if flying then
+        startFlying()
+    else
+        stopFlying()
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.W then
+            ctrl.f = 1
+        elseif input.KeyCode == Enum.KeyCode.S then
+            ctrl.b = -1
+        elseif input.KeyCode == Enum.KeyCode.A then
+            ctrl.l = -1
+        elseif input.KeyCode == Enum.KeyCode.D then
+            ctrl.r = 1
         end
     end
+end)
+
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        if input.KeyCode == Enum.KeyCode.W then
+            ctrl.f = 0
+        elseif input.KeyCode == Enum.KeyCode.S then
+            ctrl.b = 0
+        elseif input.KeyCode == Enum.KeyCode.A then
+            ctrl.l = 0
+        elseif input.KeyCode == Enum.KeyCode.D then
+            ctrl.r = 0
+        end
+    end
+end)
+
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
+    wait(0.7)
+    char.Humanoid.PlatformStand = false
+    char.Animate.Disabled = false
 end)
 
 -- [ TAB #4  -  MOVEMENT ] --
