@@ -26,6 +26,7 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local startTime = tick()
 
 local Stats = game:GetService("Stats")
