@@ -42,22 +42,20 @@ local FlySpeed = 50
 local flying = false
 local ctrl = {f = 0, b = 0, l = 0, r = 0}
 local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-local KeyDownFunction = nil
-local KeyUpFunction = nil
-local mouse = LocalPlayer:GetMouse()
+local KeyDownFunction, KeyUpFunction, FlyLoop
 
 local function Fly()
-	local character = LocalPlayer.Character
-	local isR15 = character:FindFirstChild("UpperTorso") ~= nil
-	local torso = isR15 and character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
-	
+	local UpperTorso = LocalPlayer.Character:FindFirstChild("UpperTorso") or LocalPlayer.Character:FindFirstChild("Torso")
+	if not UpperTorso then return end
+
+	local isR15 = LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R15
 	local speed = 0
-	local bg = Instance.new("BodyGyro", torso)
+	local bg = Instance.new("BodyGyro", UpperTorso)
 	bg.P = 9e4
 	bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-	bg.cframe = torso.CFrame
-	
-	local bv = Instance.new("BodyVelocity", torso)
+	bg.cframe = UpperTorso.CFrame
+
+	local bv = Instance.new("BodyVelocity", UpperTorso)
 	bv.velocity = Vector3.new(0, 0.1, 0)
 	bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
 
@@ -65,81 +63,58 @@ local function Fly()
 		PlayAnim(10714347256, 4, 0)
 	end
 
-	repeat task.wait()
-		character.Humanoid.PlatformStand = true
+	FlyLoop = RunService.RenderStepped:Connect(function()
+		LocalPlayer.Character.Humanoid.PlatformStand = true
 		if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-			speed = speed + FlySpeed * 0.10
-			if speed > FlySpeed then
-				speed = FlySpeed
-			end
-		elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-			speed = speed - FlySpeed * 0.10
-			if speed < 0 then
-				speed = 0
-			end
+			speed = math.clamp(speed + FlySpeed * 0.10, 0, FlySpeed)
+		elseif speed ~= 0 then
+			speed = math.clamp(speed - FlySpeed * 0.10, 0, FlySpeed)
 		end
 
-		if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-			bv.velocity = ((Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) + 
-						  ((Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) - 
-						  Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+		if ctrl.f + ctrl.b ~= 0 or ctrl.l + ctrl.r ~= 0 then
+			bv.velocity = ((Workspace.CurrentCamera.CFrame.LookVector * (ctrl.f + ctrl.b)) + 
+						  ((Workspace.CurrentCamera.CFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).Position) - 
+						  Workspace.CurrentCamera.CFrame.Position)) * speed
 			lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
-		elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
-			bv.velocity = ((Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f + lastctrl.b)) + 
-						  ((Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l + lastctrl.r, (lastctrl.f + lastctrl.b) * 0.2, 0).p) - 
-						  Workspace.CurrentCamera.CoordinateFrame.p)) * speed
 		else
 			bv.velocity = Vector3.new(0, 0.1, 0)
 		end
-		bg.cframe = Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / FlySpeed), 0, 0)
-	until not flying
-
-	ctrl = {f = 0, b = 0, l = 0, r = 0}
-	lastctrl = {f = 0, b = 0, l = 0, r = 0}
-	speed = 0
-	bg:Destroy()
-	bv:Destroy()
-	character.Humanoid.PlatformStand = false
+		bg.cframe = Workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / FlySpeed), 0, 0)
+	end)
 end
 
-local function onKeyDown(key)
-	if key == "w" then
-		ctrl.f = 1
-		if character:FindFirstChild("UpperTorso") then
-			PlayAnim(10714177846, 4.65, 0)
-		end
-	elseif key == "s" then
-		ctrl.b = -1
-		if character:FindFirstChild("UpperTorso") then
-			PlayAnim(10147823318, 4.11, 0)
-		end
-	elseif key == "a" then
-		ctrl.l = -1
-		if character:FindFirstChild("UpperTorso") then
-			PlayAnim(10147823318, 3.55, 0)
-		end
-	elseif key == "d" then
-		ctrl.r = 1
-		if character:FindFirstChild("UpperTorso") then
-			PlayAnim(10147823318, 4.81, 0)
+local function StopFly()
+	if FlyLoop then FlyLoop:Disconnect() end
+	if KeyDownFunction then KeyDownFunction:Disconnect() end
+	if KeyUpFunction then KeyUpFunction:Disconnect() end
+
+	local UpperTorso = LocalPlayer.Character:FindFirstChild("UpperTorso") or LocalPlayer.Character:FindFirstChild("Torso")
+	if UpperTorso then
+		for _, bodyMover in ipairs(UpperTorso:GetChildren()) do
+			if bodyMover:IsA("BodyGyro") or bodyMover:IsA("BodyVelocity") then
+				bodyMover:Destroy()
+			end
 		end
 	end
+	LocalPlayer.Character.Humanoid.PlatformStand = false
+	ctrl, lastctrl, speed = {f = 0, b = 0, l = 0, r = 0}, {f = 0, b = 0, l = 0, r = 0}, 0
 end
 
-local function onKeyUp(key)
-	if key == "w" then
-		ctrl.f = 0
-	elseif key == "s" then
-		ctrl.b = 0
-	elseif key == "a" then
-		ctrl.l = 0
-	elseif key == "d" then
-		ctrl.r = 0
+KeyDownFunction = UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+	if not gameProcessedEvent then
+		if input.KeyCode == Enum.KeyCode.W then ctrl.f = 1 end
+		if input.KeyCode == Enum.KeyCode.S then ctrl.b = -1 end
+		if input.KeyCode == Enum.KeyCode.A then ctrl.l = -1 end
+		if input.KeyCode == Enum.KeyCode.D then ctrl.r = 1 end
 	end
-	if character:FindFirstChild("UpperTorso") then
-		PlayAnim(10714347256, 4, 0)
-	end
-end
+end)
+
+KeyUpFunction = UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W then ctrl.f = 0 end
+	if input.KeyCode == Enum.KeyCode.S then ctrl.b = 0 end
+	if input.KeyCode == Enum.KeyCode.A then ctrl.l = 0 end
+	if input.KeyCode == Enum.KeyCode.D then ctrl.r = 0 end
+end)
 
 -- [ BLACK HOLE FUCTION'S ] --
 
@@ -358,15 +333,11 @@ end)
  
 MainTAB:Toggle(" ・ Enable Fly", false, function(value)
 	flying = value
-    if flying then
-        KeyDownFunction = mouse.KeyDown:Connect(onKeyDown)
-        KeyUpFunction = mouse.KeyUp:Connect(onKeyUp)
-        Fly()
-    else
-        if KeyDownFunction then KeyDownFunction:Disconnect() end
-        if KeyUpFunction then KeyUpFunction:Disconnect() end
-        LocalPlayer.Character.Humanoid.PlatformStand = false
-    end
+	if flying then
+		Fly()
+	else
+		StopFly()
+	end
 end)
 
 MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
