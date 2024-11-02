@@ -157,34 +157,48 @@ end)
 
 -- [ NOCLIP FUNCTION'S ] --
 
-local noclipEnabled = false
-local Stepped
+-- [ FLY FUNCTION'S ] --
 
-local function toggleNoclip(value)
-    noclipEnabled = value
-    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hum = chr:FindFirstChildWhichIsA("Humanoid")
 
-    if noclipEnabled then
-        Stepped = RunService.Stepped:Connect(function()
-            for _, part in pairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end)
-    else
-        if Stepped then
-            Stepped:Disconnect()
-            Stepped = nil
-        end
+local flying = false
+local speed = 7
+local bg, bv
 
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
-        end
-    end
+function startFlying()
+	local torso = chr:FindFirstChild("HumanoidRootPart")
+	if torso then
+		bg = Instance.new("BodyGyro", torso)
+		bg.P = 9e4
+		bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+		bg.CFrame = torso.CFrame
+		
+		bv = Instance.new("BodyVelocity", torso)
+		bv.Velocity = Vector3.new(0, 0.1, 0)
+		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+		
+		LocalPlayer.Character.Humanoid.PlatformStand = true
+
+		while flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0 do
+			game:GetService("RunService").RenderStepped:Wait()
+			local moveDirection = LocalPlayer.Character.Humanoid.MoveDirection
+			bv.Velocity = (moveDirection * speed) + Vector3.new(0, 0.1, 0)
+			bg.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad(moveDirection.Y * speed / 10), 0, 0)
+		end
+	end
 end
+
+function stopFlying()
+	if bg then bg:Destroy() end
+	if bv then bv:Destroy() end
+	LocalPlayer.Character.Humanoid.PlatformStand = false
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
+	wait(0.7)
+	LocalPlayer.Character.Humanoid.PlatformStand = false
+end)
 
 -- [ TAB #1  -  HOME ] --
 
@@ -306,19 +320,17 @@ spawn(function()
     end
 end)
 
-HoleTAB:Toggle(" ・ Enable Noclip", false, function(value)
-    toggleNoclip(value)
+HoleTAB:Slider(" ・ Fly Speed", 1, 100, 7, function(value)
+    speed = value
 end)
 
-LocalPlayer.CharacterAdded:Connect(function()
-    if noclipEnabled then
-        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        for _, part in pairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false 
-            end
-        end
-    end
+HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
+    flying = value
+	if flying then
+		startFlying()
+	else
+		stopFlying()
+	end
 end)
 
 -- [ TAB #4  -  MOVEMENT ] --
