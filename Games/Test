@@ -35,7 +35,7 @@ local Stats = game:GetService("Stats")
 -- [ FUNCTION'S ] --
 
 local function SendNotify(title, message, duration)
-	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration})
+	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration, Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
 end
 
 -- [ BLACK HOLE FUCTION'S ] ---
@@ -157,28 +157,33 @@ end)
 
 -- [ NOCLIP FUNCTION'S ] --
 
--- [ FLY FUNCTION'S ] --
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local noclip = false
 
-local isFlying = false
-local flySpeed = 50
-
-local function fly()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-
-    if isFlying and humanoid and rootPart then
-        game:GetService("RunService").Heartbeat:Connect(function()
-            if isFlying then
-                local moveDirection = humanoid.MoveDirection * flySpeed
-                rootPart.Velocity = Vector3.new(moveDirection.X, moveDirection.Y, moveDirection.Z)
-            else
-                rootPart.Velocity = Vector3.new(0, 0, 0)
+local function enableNoclip()
+    noclip = true
+    while noclip do
+        for _, part in pairs(character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
             end
-        end)
+        end
+        game:GetService("RunService").Stepped:Wait()
     end
 end
+
+local function disableNoclip()
+    noclip = false
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") and not part.CanCollide then
+            part.CanCollide = true
+        end
+    end
+end
+
+-- [ FLY FUNCTION'S ] --
+
+
 
 --[[
 local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -222,6 +227,37 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 	LocalPlayer.Character.Humanoid.PlatformStand = false
 end)
 --]]
+
+--[ TOUCHFLING FUNCTION'S ] --
+
+local function GetCharacter(LocalPlayer)
+	if LocalPlayer.Character then
+		return LocalPlayer.Character
+	end
+end
+
+local function GetRoot(LocalPlayer)
+	if GetCharacter(LocalPlayer):FindFirstChild("HumanoidRootPart") then
+		return GetCharacter(LocalPlayer).HumanoidRootPart
+	end
+end
+
+local function ToggleFling(bool)
+	task.spawn(function()
+		if bool then
+			local RVelocity = nil
+			repeat
+				pcall(function()
+					RVelocity = GetRoot(LocalPlayer).Velocity 
+					GetRoot(LocalPlayer).Velocity = Vector3.new(math.random(-150,150),-25000,math.random(-150,150))
+					RunService.RenderStepped:wait()
+					GetRoot(LocalPlayer).Velocity = RVelocity
+				end)
+				RunService.Heartbeat:wait()
+			until not bool
+		end
+	end)
+end
 
 -- [ TAB #1  -  HOME ] --
 
@@ -317,6 +353,10 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
+MainTAB:Toggle(" ・ Touch Fling", false, function(value)
+    ToggleFling(value)
+end)
+
 -- [ TAB #3  -  BLACKHOLE ] --
 
 HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
@@ -343,14 +383,19 @@ spawn(function()
     end
 end)
 
+HoleTAB:Toggle(" ・ Enable Noclip", false, function(value)
+    if value then
+        enableNoclip()
+    else
+        disableNoclip()
+    end
+end)
+
 HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
-    flySpeed = value
     --speed = value
 end)
 
 HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
-    isFlying = value
-    fly()
     --flying = value
     --if flying then
     --    startFlying()
