@@ -25,6 +25,8 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 
+local mouse = LocalPlayer:GetMouse()
+
 local RunService = game:GetService("RunService")
 local startTime = tick()
 
@@ -47,7 +49,7 @@ local KeyDownFunction = nil
 local KeyUpFunction = nil
 
 local function Fly()
-	local UpperTorso = plr.Character.UpperTorso
+	local UpperTorso = LocalPlayer.Character.UpperTorso
 	local speed = 0
 	local bg = Instance.new("BodyGyro", UpperTorso)
 	bg.P = 9e4
@@ -60,7 +62,7 @@ local function Fly()
 
 	PlayAnim(10714347256, 4, 0)
 	repeat task.wait()
-		plr.Character.Humanoid.PlatformStand = true
+		LocalPlayer.Character.Humanoid.PlatformStand = true
 		if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
 			speed = speed + FlySpeed * 0.10
 			if speed > FlySpeed then
@@ -93,7 +95,7 @@ local function Fly()
 	speed = 0
 	bg:Destroy()
 	bv:Destroy()
-	plr.Character.Humanoid.PlatformStand = false
+	LocalPlayer.Character.Humanoid.PlatformStand = false
 end
 
 local function onKeyDown(key)
@@ -346,7 +348,7 @@ MainTAB:Toggle(" ・ Enable Fly", false, function(value)
 	else
 		KeyDownFunction:Disconnect()
 		KeyUpFunction:Disconnect()
-		plr.Character.Humanoid.PlatformStand = false
+		LocalPlayer.Character.Humanoid.PlatformStand = false
 	end
 end)
 
