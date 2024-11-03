@@ -35,7 +35,7 @@ local Stats = game:GetService("Stats")
 -- [ FUNCTION'S ] --
 
 local function SendNotify(title, message, duration)
-	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration})
+	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration, Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
 end
 
 -- [ BLACK HOLE FUCTION'S ] ---
@@ -155,40 +155,8 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
--- [ NOCLIP FUNCTION'S ] --
-
 -- [ FLY FUNCTION'S ] --
 
-local flying = false
-local flySpeed = 50
-local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local bodyGyro, bodyVelocity
-
--- Función para iniciar el vuelo
-local function startFly()
-    if flying then return end  -- Evita iniciar el vuelo dos veces
-    flying = true
-    bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.P = 9e4
-    bodyGyro.Parent = humanoidRootPart
-    bodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-    bodyVelocity.Parent = humanoidRootPart
-end
-
--- Función para detener el vuelo
-local function stopFly()
-    if not flying then return end  -- Evita detener el vuelo si ya está detenido
-    flying = false
-    if bodyGyro then bodyGyro:Destroy() end
-    if bodyVelocity then bodyVelocity:Destroy() end
-end
-
---[[
 local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local hum = chr:FindFirstChildWhichIsA("Humanoid")
 
@@ -229,7 +197,6 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 	wait(0.7)
 	LocalPlayer.Character.Humanoid.PlatformStand = false
 end)
---]]
 
 -- [ TAB #1  -  HOME ] --
 
@@ -325,6 +292,19 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
+HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
+    flying = value
+    if flying then
+        startFlying()
+    else
+        stopFlying()
+    end
+end)
+
+HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
+    speed = value
+end)
+
 -- [ TAB #3  -  BLACKHOLE ] --
 
 HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
@@ -348,52 +328,6 @@ spawn(function()
         if blackHoleActive then
             angle = angle + math.rad(angleSpeed)
         end
-    end
-end)
-
-HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
-    flySpeed = value
-    --speed = value
-end)
-
-HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
-    if value then
-        startFly()
-    else
-        stopFly()
-    end
-    --flying = value
-    --if flying then
-    --    startFlying()
-    --else
-    --    stopFlying()
-    --end
-end)
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    if flying then
-        local moveDirection = Vector3.new(0, 0, 0)
-
-        -- Soporte para dispositivos móviles y PC
-        local userInput = game:GetService("UserInputService")
-
-        -- Controles de dirección: W, A, S, D para PC y controles de móvil
-        if userInput:IsKeyDown(Enum.KeyCode.W) or userInput:IsKeyDown(Enum.KeyCode.Up) then
-            moveDirection = moveDirection + humanoidRootPart.CFrame.LookVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.S) or userInput:IsKeyDown(Enum.KeyCode.Down) then
-            moveDirection = moveDirection - humanoidRootPart.CFrame.LookVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.A) or userInput:IsKeyDown(Enum.KeyCode.Left) then
-            moveDirection = moveDirection - humanoidRootPart.CFrame.RightVector
-        end
-        if userInput:IsKeyDown(Enum.KeyCode.D) or userInput:IsKeyDown(Enum.KeyCode.Right) then
-            moveDirection = moveDirection + humanoidRootPart.CFrame.RightVector
-        end
-
-        -- Mantiene la dirección del personaje en vuelo y ajusta la velocidad
-        bodyGyro.CFrame = workspace.CurrentCamera.CFrame
-        bodyVelocity.Velocity = moveDirection * flySpeed
     end
 end)
 
