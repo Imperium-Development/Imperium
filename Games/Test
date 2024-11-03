@@ -1,0 +1,73 @@
+local ADMINS = {
+    5127756688
+}
+
+local MODS = {
+    000
+}
+
+local STARS = {
+    000
+}
+
+local playersUsingScript = {}
+
+local function formatNumber(n)
+    n = tostring(n)
+    return n:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end
+
+local function markPlayerUsingScript(playerId)
+    if not table.find(playersUsingScript, playerId) then
+        table.insert(playersUsingScript, playerId)
+    end
+end
+
+local function updateDisplayName(player)
+    local humanoid = player.Character and player.Character:FindFirstChildWhichIsA('Humanoid')
+    if humanoid then
+        local plrID = player.UserId
+        if table.find(ADMINS, plrID) then
+            humanoid.DisplayName = ('[🦇] ' .. player.DisplayName)
+        elseif table.find(MODS, plrID) then
+            humanoid.DisplayName = ('[👑] ' .. player.DisplayName)
+        elseif table.find(STARS, plrID) then
+            humanoid.DisplayName = ('[⭐] ' .. player.DisplayName)
+        elseif table.find(playersUsingScript, plrID) then
+            humanoid.DisplayName = ('[😎] ' .. player.DisplayName)
+        end
+    end
+end
+
+local function onCharacterAdded(player)
+    player.CharacterAdded:Connect(function(character)
+        -- Espera a que el humanoide esté disponible antes de actualizar el nombre
+        local humanoid = character:WaitForChild('Humanoid')
+        updateDisplayName(player)
+    end)
+end
+
+local function ImperiumEmojis()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        onCharacterAdded(player)
+        updateDisplayName(player) -- Actualiza inmediatamente el nombre si el personaje ya está cargado
+    end
+end
+
+local localPlayer = game.Players.LocalPlayer
+markPlayerUsingScript(localPlayer.UserId)
+
+-- Conectar el evento CharacterAdded para el jugador local
+localPlayer.CharacterAdded:Connect(function()
+    updateDisplayName(localPlayer)
+end)
+
+-- Escuchar nuevos jugadores que se unan al juego
+game.Players.PlayerAdded:Connect(function(player)
+    onCharacterAdded(player)
+end)
+
+local succ, errr = pcall(ImperiumEmojis)
+if not succ then
+    warn("> Imperium  |  Error  •  While executing Name Emojis: " .. errr)
+end
