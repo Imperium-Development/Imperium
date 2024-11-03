@@ -173,29 +173,22 @@ function startFlying()
 		bg.CFrame = torso.CFrame
 		
 		bv = Instance.new("BodyVelocity", torso)
-		bv.Velocity = Vector3.new(0, 0.1, 0)
 		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 		
 		LocalPlayer.Character.Humanoid.PlatformStand = true
 		
 		while flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0 do
 			game:GetService("RunService").RenderStepped:Wait()
+			local moveDirection = LocalPlayer.Character.Humanoid.MoveDirection
+			local cameraCFrame = workspace.CurrentCamera.CFrame
+			local upDirection = Vector3.new(0, 1, 0)
+			local downDirection = Vector3.new(0, -1, 0)
 
-			local camera = workspace.CurrentCamera
-			local moveDirection = Vector3.new(0, 0, 0)
+			local forward = cameraCFrame.LookVector
+			local right = cameraCFrame.RightVector
 
-			if camera then
-				local forward = camera.CFrame.LookVector
-				local right = camera.CFrame.RightVector
-
-				-- Se calcula el movimiento en función de la dirección de la cámara y la entrada del jugador
-				local moveInput = LocalPlayer.Character.Humanoid.MoveDirection
-				moveDirection = (forward * moveInput.Z + right * moveInput.X) * speed
-			end
-
-			-- Asigna la nueva velocidad incluyendo el pequeño impulso hacia arriba
-			bv.Velocity = moveDirection + Vector3.new(0, 0.1, 0)
-			bg.CFrame = camera.CFrame
+			bv.Velocity = (moveDirection.x * right + moveDirection.z * forward + (moveDirection.y > 0 and upDirection or downDirection) * math.abs(moveDirection.y) * speed) * speed
+			bg.CFrame = cameraCFrame * CFrame.Angles(-math.rad(moveDirection.Y * speed / 10), 0, 0)
 		end
 	end
 end
@@ -209,10 +202,6 @@ end
 game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 	wait(0.7)
 	LocalPlayer.Character.Humanoid.PlatformStand = false
-	if flying then
-		-- Si estamos volando, reiniciamos el vuelo
-		startFlying()
-	end
 end)
 
 --[[
