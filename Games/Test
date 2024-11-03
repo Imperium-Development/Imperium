@@ -272,6 +272,54 @@ FlyDButton.Size = UDim2.new(0, 30, 0, 40)
 
 local flying = false
 local ctrl = {f = 0, b = 0, l = 0, r = 0}
+local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+local forward, backward, left, right = false, false, false, false
+
+local function startFlying()
+    local UpperTorso = LocalPlayer.Character:WaitForChild("UpperTorso")
+    local bg = Instance.new("BodyGyro", UpperTorso)
+    bg.P = 9e4
+    bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.cframe = UpperTorso.CFrame
+    local bv = Instance.new("BodyVelocity", UpperTorso)
+    bv.velocity = Vector3.new(0,0.1,0)
+    bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+
+    PlayAnim(10714347256, 4, 0)
+
+    while flying do
+        task.wait()
+        LocalPlayer.Character.Humanoid.PlatformStand = true
+
+        bv.velocity = Vector3.new(0, 0.1, 0)  -- Mantener una ligera elevación
+
+        if forward then
+            bv.velocity = bv.velocity + (game.Workspace.CurrentCamera.CoordinateFrame.lookVector * FlySpeed)
+        end
+        if backward then
+            bv.velocity = bv.velocity - (game.Workspace.CurrentCamera.CoordinateFrame.lookVector * FlySpeed)
+        end
+        if left then
+            bv.velocity = bv.velocity - (game.Workspace.CurrentCamera.CoordinateFrame.rightVector * FlySpeed)
+        end
+        if right then
+            bv.velocity = bv.velocity + (game.Workspace.CurrentCamera.CoordinateFrame.rightVector * FlySpeed)
+        end
+
+        bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame
+    end
+
+    bg:Destroy()
+    bv:Destroy()
+    LocalPlayer.Character.Humanoid.PlatformStand = false
+end
+
+local function stopFlying()
+    StopAnim()
+    Fly_Pad.Visible = false
+    flying = false
+    forward, backward, left, right = false, false, false, false
+end
 
 --[[
 local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -449,45 +497,9 @@ HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
     Fly_Pad.Visible = flying
 
     if flying then
-        local UpperTorso = LocalPlayer.Character:WaitForChild("UpperTorso")
-        local speed = 0
-
-        local bg = Instance.new("BodyGyro", UpperTorso)
-        bg.P = 9e4
-        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-        bg.cframe = UpperTorso.CFrame
-        local bv = Instance.new("BodyVelocity", UpperTorso)
-        bv.velocity = Vector3.new(0,0.1,0)
-        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-
-        PlayAnim(10714347256,4,0)
-
-        while flying do
-            task.wait()
-            LocalPlayer.Character.Humanoid.PlatformStand = true
-
-            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                speed = speed + FlySpeed * 0.10
-                if speed > FlySpeed then
-                    speed = FlySpeed
-                end
-            elseif speed > 0 then
-                speed = speed - FlySpeed * 0.10
-                if speed < 0 then
-                    speed = 0
-                end
-            end
-
-            bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * 0.2, 0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
-            bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / FlySpeed), 0, 0)
-        end
-
-        bg:Destroy()
-        bv:Destroy()
-        LocalPlayer.Character.Humanoid.PlatformStand = false
+        startFlying()
     else
-        StopAnim()
-        Fly_Pad.Visible = false
+        stopFlying()
     end
     --flying = value
     --if flying then
@@ -497,64 +509,36 @@ HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
     --end
 end)
 
-mouse.KeyDown:Connect(function(key)
-    if flying then
-        if key:lower() == "w" then
-            ctrl.f = 1
-        elseif key:lower() == "s" then
-            ctrl.b = -1
-        elseif key:lower() == "a" then
-            ctrl.l = -1
-        elseif key:lower() == "d" then
-            ctrl.r = 1
-        end
-    end
-end)
-
-mouse.KeyUp:Connect(function(key)
-    if flying then
-        if key:lower() == "w" then
-            ctrl.f = 0
-        elseif key:lower() == "s" then
-            ctrl.b = 0
-        elseif key:lower() == "a" then
-            ctrl.l = 0
-        elseif key:lower() == "d" then
-            ctrl.r = 0
-        end
-    end
-end)
-
 FlyWButton.MouseButton1Down:Connect(function()
-    keypress("0x57")
+    forward = true
 end)
 
 FlyWButton.MouseButton1Up:Connect(function()
-    keyrelease("0x57")
+    forward = false
 end)
 
 FlySButton.MouseButton1Down:Connect(function()
-    keypress("0x53")
+    backward = true
 end)
 
 FlySButton.MouseButton1Up:Connect(function()
-    keyrelease("0x53")
+    backward = false
 end)
 
 FlyAButton.MouseButton1Down:Connect(function()
-    keypress("0x41")
+    left = true
 end)
 
 FlyAButton.MouseButton1Up:Connect(function()
-    keyrelease("0x41")
+    left = false
 end)
 
 FlyDButton.MouseButton1Down:Connect(function()
-    keypress("0x44")
+    right = true
 end)
 
 FlyDButton.MouseButton1Up:Connect(function()
-    keyrelease("0x44")
+    right = false
 end)
 
 HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
@@ -562,15 +546,16 @@ HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
     --speed = value
 end)
 
-game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-    flying = false
-    Fly_Pad.Visible = false
+game.Players.LocalPlayer.CharacterRemoving:Connect(function()
+    stopFlying()
 end)
 
-game.Players.LocalPlayer.CharacterRemoving:Connect(function()
-    flying = false
-    StopAnim()
-    Fly_Pad.Visible = false
+-- Asegúrate de que el flypad aparezca nuevamente al respawnear
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    Fly_Pad.Visible = false  -- Ocultamos el pad al entrar al nuevo personaje
+    task.wait(0.5) -- Esperar un momento para asegurarnos de que el nuevo personaje está completamente cargado
+    Fly_Pad.Visible = flying  -- Mostrar el pad solo si está activado
 end)
 
 -- [ TAB #4  -  MOVEMENT ] --
