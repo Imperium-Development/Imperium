@@ -273,6 +273,7 @@ FlyDButton.Size = UDim2.new(0, 30, 0, 40)
 local flying = false
 local ctrl = {f = 0, b = 0, l = 0, r = 0}
 local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+local forward, backward, left, right = false, false, false, false
 
 local function startFlying()
     local UpperTorso = LocalPlayer.Character:WaitForChild("UpperTorso")
@@ -281,7 +282,7 @@ local function startFlying()
     bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
     bg.cframe = UpperTorso.CFrame
     local bv = Instance.new("BodyVelocity", UpperTorso)
-    bv.velocity = Vector3.new(0,0.1,0)
+    bv.velocity = Vector3.new(0, 0.1, 0)
     bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
 
     PlayAnim(10714347256, 4, 0)
@@ -292,13 +293,16 @@ local function startFlying()
 
         bv.velocity = Vector3.new(0, 0.1, 0)  -- Mantener una ligera elevación
 
-        if FlyWButton.MouseButton1Down then
+        if forward then
             bv.velocity = bv.velocity + (game.Workspace.CurrentCamera.CoordinateFrame.lookVector * FlySpeed)
-        elseif FlySButton.MouseButton1Down then
+        end
+        if backward then
             bv.velocity = bv.velocity - (game.Workspace.CurrentCamera.CoordinateFrame.lookVector * FlySpeed)
-        elseif FlyAButton.MouseButton1Down then
+        end
+        if left then
             bv.velocity = bv.velocity - (game.Workspace.CurrentCamera.CoordinateFrame.rightVector * FlySpeed)
-        elseif FlyDButton.MouseButton1Down then
+        end
+        if right then
             bv.velocity = bv.velocity + (game.Workspace.CurrentCamera.CoordinateFrame.rightVector * FlySpeed)
         end
 
@@ -314,6 +318,7 @@ local function stopFlying()
     StopAnim()
     Fly_Pad.Visible = false
     flying = false
+    forward, backward, left, right = false, false, false, false
 end
 
 --[[
@@ -505,35 +510,35 @@ HoleTAB:Toggle(" ・ Enable Fly", false, function(value)
 end)
 
 FlyWButton.MouseButton1Down:Connect(function()
-    keypress("0x57")
+    forward = true
 end)
 
 FlyWButton.MouseButton1Up:Connect(function()
-    keyrelease("0x57")
+    forward = false
 end)
 
 FlySButton.MouseButton1Down:Connect(function()
-    keypress("0x53")
+    backward = true
 end)
 
 FlySButton.MouseButton1Up:Connect(function()
-    keyrelease("0x53")
+    backward = false
 end)
 
 FlyAButton.MouseButton1Down:Connect(function()
-    keypress("0x41")
+    left = true
 end)
 
 FlyAButton.MouseButton1Up:Connect(function()
-    keyrelease("0x41")
+    left = false
 end)
 
 FlyDButton.MouseButton1Down:Connect(function()
-    keypress("0x44") 
+    right = true
 end)
 
 FlyDButton.MouseButton1Up:Connect(function()
-    keyrelease("0x44")
+    right = false
 end)
 
 HoleTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
@@ -543,6 +548,16 @@ end)
 
 game.Players.LocalPlayer.CharacterRemoving:Connect(function()
     stopFlying()
+end)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    character:WaitForChild("Humanoid")
+    Fly_Pad.Visible = false  -- Ocultamos el pad al entrar al nuevo personaje
+    task.wait(0.5) -- Esperar un momento para asegurarnos de que el nuevo personaje está completamente cargado
+    if flying then  -- Mostrar el pad solo si está activado
+        Fly_Pad.Visible = true
+        startFlying()  -- Reiniciar el vuelo si estaba activado
+    end
 end)
 
 -- [ TAB #4  -  MOVEMENT ] --
