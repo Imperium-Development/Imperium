@@ -157,99 +157,14 @@ end)
 
 -- [ FLY FUNCTION'S ] --
 
-speeds = 1
+speeds = 5
+
 local speaker = game:GetService("Players").LocalPlayer
+
 local chr = game.Players.LocalPlayer.Character
 local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+
 nowe = false
-
-local function toggleFly()
-    if nowe == true then
-        nowe = false
-
-        -- Habilitar estados de Humanoid
-        for _, state in ipairs({
-            Enum.HumanoidStateType.Climbing,
-            Enum.HumanoidStateType.FallingDown,
-            Enum.HumanoidStateType.Flying,
-            Enum.HumanoidStateType.Freefall,
-            Enum.HumanoidStateType.GettingUp,
-            Enum.HumanoidStateType.Jumping,
-            Enum.HumanoidStateType.Landed,
-            Enum.HumanoidStateType.Physics,
-            Enum.HumanoidStateType.PlatformStanding,
-            Enum.HumanoidStateType.Ragdoll,
-            Enum.HumanoidStateType.Running,
-            Enum.HumanoidStateType.RunningNoPhysics,
-            Enum.HumanoidStateType.Seated,
-            Enum.HumanoidStateType.StrafingNoPhysics,
-            Enum.HumanoidStateType.Swimming
-        }) do
-            speaker.Character.Humanoid:SetStateEnabled(state, true)
-        end
-        speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
-    else
-        nowe = true
-
-        for i = 1, speeds do
-            spawn(function()
-                local hb = game:GetService("RunService").Heartbeat
-                tpwalking = true
-                local chr = game.Players.LocalPlayer.Character
-                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-                while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                    if hum.MoveDirection.Magnitude > 0 then
-                        chr:TranslateBy(hum.MoveDirection)
-                    end
-                end
-            end)
-        end
-        game.Players.LocalPlayer.Character.Animate.Disabled = true
-
-        -- Deshabilitar estados de Humanoid
-        for _, state in ipairs({
-            Enum.HumanoidStateType.Climbing,
-            Enum.HumanoidStateType.FallingDown,
-            Enum.HumanoidStateType.Flying,
-            Enum.HumanoidStateType.Freefall,
-            Enum.HumanoidStateType.GettingUp,
-            Enum.HumanoidStateType.Jumping,
-            Enum.HumanoidStateType.Landed,
-            Enum.HumanoidStateType.Physics,
-            Enum.HumanoidStateType.PlatformStanding,
-            Enum.HumanoidStateType.Ragdoll,
-            Enum.HumanoidStateType.Running,
-            Enum.HumanoidStateType.RunningNoPhysics,
-            Enum.HumanoidStateType.Seated,
-            Enum.HumanoidStateType.StrafingNoPhysics,
-            Enum.HumanoidStateType.Swimming
-        }) do
-            speaker.Character.Humanoid:SetStateEnabled(state, false)
-        end
-        speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
-    end
-end
-
-local function increaseSpeed()
-    speeds = speeds + 1
-    speed.Text = speeds
-    if nowe == true then
-        tpwalking = false
-        for i = 1, speeds do
-            spawn(function()
-                local hb = game:GetService("RunService").Heartbeat
-                tpwalking = true
-                local chr = game.Players.LocalPlayer.Character
-                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-                while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                    if hum.MoveDirection.Magnitude > 0 then
-                        chr:TranslateBy(hum.MoveDirection)
-                    end
-                end
-            end)
-        end
-    end
-end
 
 --[[
 local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -386,7 +301,139 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 end)
 
 MainTAB:Toggle(" ・ Enable Fly", false, function(value)
-    toggleFly()
+    if value then
+		nowe = true
+
+		for i = 1, speeds do
+			spawn(function()
+				local hb = game:GetService("RunService").Heartbeat	
+
+				tpwalking = true
+				local chr = game.Players.LocalPlayer.Character
+				local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+				while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+					if hum.MoveDirection.Magnitude > 0 then
+						chr:TranslateBy(hum.MoveDirection)
+					end
+				end
+			end)
+		end
+
+		game.Players.LocalPlayer.Character.Animate.Disabled = true
+		local Char = game.Players.LocalPlayer.Character
+		local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
+
+		for i,v in next, Hum:GetPlayingAnimationTracks() do
+			v:AdjustSpeed(0)
+		end
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false)
+		speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
+
+		if speaker.Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
+			local torso = speaker.Character.Torso
+			local flying = true
+			local ctrl = {f = 0, b = 0, l = 0, r = 0}
+			local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+			local maxspeed = 50
+			local speed = 0
+
+			local bg = Instance.new("BodyGyro", torso)
+			bg.P = 9e4
+			bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+			bg.cframe = torso.CFrame
+			local bv = Instance.new("BodyVelocity", torso)
+			bv.velocity = Vector3.new(0,0.1,0)
+			bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+			speaker.Character.Humanoid.PlatformStand = true
+
+			while nowe == true and speaker.Character.Humanoid.Health > 0 do
+				game:GetService("RunService").RenderStepped:Wait()
+
+				if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+					speed = speed + .5 + (speed/maxspeed)
+					if speed > maxspeed then
+						speed = maxspeed
+					end
+				elseif speed > 0 then
+					speed = speed - 1
+					if speed < 0 then
+						speed = 0
+					end
+				end
+
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) +
+					((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) -
+					game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+
+				bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
+			end
+			bg:Destroy()
+			bv:Destroy()
+			speaker.Character.Humanoid.PlatformStand = false
+			tpwalking = false
+
+		else
+			local UpperTorso = speaker.Character.UpperTorso
+			local flying = true
+			local ctrl = {f = 0, b = 0, l = 0, r = 0}
+			local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+			local maxspeed = 50
+			local speed = 0
+
+			local bg = Instance.new("BodyGyro", UpperTorso)
+			bg.P = 9e4
+			bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+			bg.cframe = UpperTorso.CFrame
+			local bv = Instance.new("BodyVelocity", UpperTorso)
+			bv.velocity = Vector3.new(0,0.1,0)
+			bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+			speaker.Character.Humanoid.PlatformStand = true
+
+			while nowe == true and speaker.Character.Humanoid.Health > 0 do
+				wait()
+
+				if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+					speed = speed + .5 + (speed / maxspeed)
+					if speed > maxspeed then
+						speed = maxspeed
+					end
+				elseif speed > 0 then
+					speed = speed - 1
+					if speed < 0 then
+						speed = 0
+					end
+				end
+
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f + ctrl.b)) +
+					((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l + ctrl.r, (ctrl.f + ctrl.b) * .2, 0).p) -
+					game.Workspace.CurrentCamera.CoordinateFrame.p)) * speed
+
+				bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
+			end
+			bg:Destroy()
+			bv:Destroy()
+			speaker.Character.Humanoid.PlatformStand = false
+			tpwalking = false
+		end
+	else
+		nowe = false
+		speaker.Character.Humanoid.PlatformStand = false
+		game.Players.LocalPlayer.Character.Animate.Disabled = false
+	end
     --[[flying = value
     if flying then
         startFlying()
@@ -395,15 +442,33 @@ MainTAB:Toggle(" ・ Enable Fly", false, function(value)
     end--]]
 end)
 
-MainTAB:Slider(" ・ Fly Speed", 1, 100, 50, function(value)
+MainTAB:Slider(" ・ Fly Speed", 1, 100, 5, function(value)
     speeds = value
+	speed.Text = speeds
+	if nowe == true then
+		tpwalking = false
+		for i = 1, speeds do
+			spawn(function()
+				local hb = game:GetService("RunService").Heartbeat	
+
+				tpwalking = true
+				local chr = game.Players.LocalPlayer.Character
+				local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+				while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+					if hum.MoveDirection.Magnitude > 0 then
+						chr:TranslateBy(hum.MoveDirection)
+					end
+				end
+			end)
+		end
+	end
     --speed = value
 end)
 
 game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
-    wait(0.7)
-    game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
-    game.Players.LocalPlayer.Character.Animate.Disabled = false
+	wait(0.7)
+	game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
+	game.Players.LocalPlayer.Character.Animate.Disabled = false
 end)
 
 -- [ TAB #3  -  BLACKHOLE ] --
