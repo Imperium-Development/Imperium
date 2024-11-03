@@ -230,63 +230,35 @@ MainTAB:Button(" ・ Current Disaster", function()
 	ImperiumLib:Notification("Notification", "The current disaster are "..game.Players.LocalPlayer.Character.SurvivalTag.Value, "Okay!")
 end)
 
-MainTAB:Button(" ・ Lunch Rocket", function()
-    local launchLand = workspace:FindFirstChild("Structure"):FindFirstChild("Launch Land")
-    if not launchLand then
-        warn("> Imperium  |  Error  •  Launch Land not found in workspace.")
-        return
-    end
+MainTAB:Button(" ・ Launch Rocket", function()
+    local launchLand = workspace:FindFirstChild("Launch Land")
 
-    local rocketStand = launchLand:FindFirstChild("RocketStand")
-    if not rocketStand then
-        warn("> Imperium  |  Error  •  RocketStand not found in Launch Land.")
-        return
-    end
+    if launchLand then
+        local consoleUpper = launchLand.RocketStand.ConsoleUpper.ReleaseButtonUpper
+        local consoleLower = launchLand.RocketStand.ConsoleLower.ReleaseButtonLower
+        local loadingTower = launchLand.LoadingTower.Console.ReleaseEntryBridge
+        local rocketActive = launchLand["SPACESHIP!!"].Shuttle.IgnitionButton
 
-    local consoleUpper = rocketStand:FindFirstChild("ConsoleUpper"):FindFirstChild("ReleaseButtonUpper")
-    local consoleLower = rocketStand:FindFirstChild("ConsoleLower"):FindFirstChild("ReleaseButtonLower")
-    local loadingTower = launchLand:FindFirstChild("LoadingTower"):FindFirstChild("Console"):FindFirstChild("ReleaseEntryBridge")
-    local rocketActive = launchLand:FindFirstChild("SPACESHIP!!"):FindFirstChild("Shuttle"):FindFirstChild("IgnitionButton")
+        local clickDetectorUpper = consoleUpper:FindFirstChildOfClass("ClickDetector")
+        local clickDetectorLower = consoleLower:FindFirstChildOfClass("ClickDetector")
+        local clickDetectorLoadingTower = loadingTower:FindFirstChildOfClass("ClickDetector")
+        local clickDetectorRocketActive = rocketActive:FindFirstChildOfClass("ClickDetector")
 
-    local function clickIfExists(object)
-        if object then
-            local clickDetector = object:FindFirstChildOfClass("ClickDetector")
-            if clickDetector then
-                clickDetector:FireClick()
-            else
-                warn("> Imperium  |  " .. object.Name .. "  •  Does not have a ClickDetector.")
-            end
-        else
-            error("> Imperium  |  Error  •  Object not found.")
+        if clickDetectorUpper then
+            clickDetectorUpper:FireClick()
         end
+        if clickDetectorLower then
+            clickDetectorLower:FireClick()
+        end
+        if clickDetectorLoadingTower then
+            clickDetectorLoadingTower:FireClick()
+        end
+        if clickDetectorRocketActive then
+            clickDetectorRocketActive:FireClick()
+        end
+    else
+        print("> Imperium  |  Error  •  Launch Land not found in workspace.")
     end
-
-    clickIfExists(consoleUpper)
-    clickIfExists(consoleLower)
-    clickIfExists(loadingTower)
-    clickIfExists(rocketActive)
-	--[[local consoleUpper = workspace.Structure["Launch Land"].RocketStand.ConsoleUpper.ReleaseButtonUpper
-    local consoleLower = workspace.Structure["Launch Land"].RocketStand.ConsoleLower.ReleaseButtonLower
-    local loadingTower = workspace.Structure["Launch Land"].LoadingTower.Console.ReleaseEntryBridge
-    local rocketActive = workspace.Structure["Launch Land"].["SPACESHIP!!"].Shuttle.IgnitionButton
-
-    local clickDetectorUpper = consoleUpper:FindFirstChildOfClass("ClickDetector")
-    local clickDetectorLower = consoleLower:FindFirstChildOfClass("ClickDetector")
-    local clickDetectorLoadingTower = loadingTower:FindFirstChildOfClass("ClickDetector")
-    local clickDetectorRocketActive = rocketActive:FindFirstChildOfClass("ClickDetector")
-
-    if clickDetectorUpper then
-        clickDetectorUpper:FireClick()
-    end
-    if clickDetectorLower then
-        clickDetectorLower:FireClick()
-    end
-    if clickDetectorLoadingTower then
-        clickDetectorLoadingTower:FireClick()
-    end
-    if clickDetectorRocketActive then
-        clickDetectorRocketActive:FireClick()
-    end--]]
 end)
 
 MainTAB:Button(" ・ Become Prisoner", function()
