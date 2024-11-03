@@ -330,21 +330,7 @@ MainTAB:Toggle(" ・ Enable Fly", false, function(value)
         else 
 
             nowe = true
-            tpwalking = state
-
-            spawn(function()
-                local hb = game:GetService("RunService").Heartbeat
-                local chr = game.Players.LocalPlayer.Character
-                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-
-                while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                    if hum.MoveDirection.Magnitude > 0 then
-                        chr:TranslateBy(hum.MoveDirection * speeds)
-                    end
-                end
-            end)
-
-            --[[
+            
             for i = 1, speeds do
                 spawn(function()
     
@@ -357,9 +343,13 @@ MainTAB:Toggle(" ・ Enable Fly", false, function(value)
                         if hum.MoveDirection.Magnitude > 0 then
                             chr:TranslateBy(hum.MoveDirection)
                         end
+                        if not nowe then
+                            tpwalking = false
+                            break
+                        end
                     end
                 end)
-            end--]]
+            end
             
             game.Players.LocalPlayer.Character.Animate.Disabled = true
             local Char = game.Players.LocalPlayer.Character
