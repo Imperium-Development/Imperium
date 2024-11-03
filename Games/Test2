@@ -180,6 +180,61 @@ function startFlying()
 		
 		while flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0 do
 			game:GetService("RunService").RenderStepped:Wait()
+			
+			local camera = workspace.CurrentCamera
+			local moveDirection = Vector3.new()
+
+			if camera then
+				local forward = camera.CFrame.LookVector
+				local right = camera.CFrame.RightVector
+				local up = Vector3.new(0, 1, 0)
+
+				moveDirection = (forward * (speed * (LocalPlayer.Character.Humanoid.MoveDirection.Z))) +
+								(right * (speed * (LocalPlayer.Character.Humanoid.MoveDirection.X))) +
+								(up * (speed * (LocalPlayer.Character.Humanoid.MoveDirection.Y)))
+			end
+
+			bv.Velocity = moveDirection + Vector3.new(0, 0.1, 0)
+			bg.CFrame = camera.CFrame
+		end
+	end
+end
+
+function stopFlying()
+	if bg then bg:Destroy() end
+	if bv then bv:Destroy() end
+	LocalPlayer.Character.Humanoid.PlatformStand = false
+end
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
+	wait(0.7)
+	LocalPlayer.Character.Humanoid.PlatformStand = false
+end)
+
+--[[
+local chr = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hum = chr:FindFirstChildWhichIsA("Humanoid")
+
+local flying = false
+local speed = 50
+local bg, bv
+
+function startFlying()
+	local torso = chr:FindFirstChild("HumanoidRootPart")
+	if torso then
+		bg = Instance.new("BodyGyro", torso)
+		bg.P = 9e4
+		bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+		bg.CFrame = torso.CFrame
+		
+		bv = Instance.new("BodyVelocity", torso)
+		bv.Velocity = Vector3.new(0, 0.1, 0)
+		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+		
+		LocalPlayer.Character.Humanoid.PlatformStand = true
+		
+		while flying and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0 do
+			game:GetService("RunService").RenderStepped:Wait()
 			local moveDirection = LocalPlayer.Character.Humanoid.MoveDirection
 			bv.Velocity = (moveDirection * speed) + Vector3.new(0, 0.1, 0)
 			bg.CFrame = workspace.CurrentCamera.CFrame * CFrame.Angles(-math.rad(moveDirection.Y * speed / 10), 0, 0)
@@ -197,6 +252,8 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 	wait(0.7)
 	LocalPlayer.Character.Humanoid.PlatformStand = false
 end)
+
+--]]
 
 -- [ TAB #1  -  HOME ] --
 
