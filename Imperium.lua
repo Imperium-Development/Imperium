@@ -67,3 +67,5 @@ elseif game.PlaceId == 192800 then
 elseif game.PlaceId == 3101667897 or game.PlaceId == 3232996272 or game.PlaceId == 3276265788 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/Games/Legends%20Of%20Speed.lua"))()
 end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/.assets/ImperiumEmojis.lua"))()
