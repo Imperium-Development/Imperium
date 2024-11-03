@@ -1,0 +1,104 @@
+local players = game:GetService("Players")
+local plr = players.LocalPlayer
+local OnBenx = false
+local prefix = "!"
+local Flinging = false
+
+local BrokenVip = {}
+local BrokenPremium = {}
+local BrokenStaff = {5127756688}
+
+local milk = {12480466786}
+local jumpscares = {10755920324, 1119705746, 12213285275, 12293699441, 10727260846, 12342625873, 8804558033}
+
+local function GetRoot(player)
+    return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+local function GetLT(player)
+    return player.Character and player.Character:FindFirstChild("LowerTorso")
+end
+
+local function GetHum(player)
+    return player.Character and player.Character:FindFirstChild("Humanoid")
+end
+
+local function GetPing()
+    return (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()) / 1000
+end
+
+local function GetPlayer(UserDisplay)
+    if UserDisplay ~= "" then
+        for _, v in pairs(players:GetPlayers()) do
+            if v.Name:lower():match(UserDisplay) or v.DisplayName:lower():match(UserDisplay) then
+                return v
+            end
+        end
+    end
+    return nil
+end
+
+local function ToggleFling(bool)
+    task.spawn(function()
+        Flinging = bool
+        while Flinging do
+            local root = GetRoot(plr)
+            if root then
+                local RVelocity = root.Velocity
+                root.Velocity = Vector3.new(math.random(-150, 150), 9000, math.random(-150, 150))
+                game.RunService.RenderStepped:wait()
+                root.Velocity = RVelocity
+                game.RunService.Heartbeat:wait()
+            end
+        end
+    end)
+end
+
+local function Arg3(command)
+    local x = ""
+    for i = 3, #command do
+        x = x .. " " .. command[i]
+    end
+    return x:sub(2)
+end
+
+local function CheckCMD(arg, command)
+    return string.find(arg, prefix .. command) ~= nil
+end
+
+local function ExecuteCommand(Pid, msg)
+    local Speaker = players:GetPlayerByUserId(Pid)
+    if not Speaker then return end
+    local LowerCMD = msg:lower()
+    local Split = string.split(LowerCMD, " ")
+    local LowerName, LowerDisplay = string.lower(plr.Name), string.lower(plr.DisplayName)
+
+    local function CanExecute()
+        return true -- Puedes agregar tus condiciones aquí.
+    end
+
+    print("Comando recibido: " .. msg) -- Debug
+
+    pcall(function()
+        local Allowed = string.find(LowerDisplay, Split[2]) or string.find(LowerName, Split[2])
+        if Allowed and CanExecute() then
+            if CheckCMD(Split[1], "bring") then
+                print("Ejecutando comando: bring") -- Debug
+                local root = GetRoot(Speaker)
+                if root then
+                    GetRoot(plr).CFrame = root.CFrame
+                end
+            elseif CheckCMD(Split[1], "fling") then
+                print("Ejecutando comando: fling") -- Debug
+                ToggleFling(true)
+            -- Agrega más comandos aquí con print para verificar si llegan
+            end
+        end
+    end)
+end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.Chatted:Connect(function(msg)
+        ExecuteCommand(player.UserId, msg)
+    end)
+end)
