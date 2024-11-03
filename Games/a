@@ -1,0 +1,398 @@
+--[[
+
+Coding: utf-8
+Copyright (C) 2024 github.com/donfushii
+
+--]]
+
+
+local ImperiumLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/UILibrary/ImperiumLibrary"))()
+
+local Windows = ImperiumLib:Window("Imperium", Color3.fromRGB(245, 102, 154), Enum.KeyCode.V)
+ImperiumLib:Notification("Notification", "Welcome to Imperium. Thanks for using my HUB, Soon we will bring more.", "Okay!")
+
+-- [ TABS ] --
+
+local HomeTAB = Windows:Tab("Home")
+local MainTAB = Windows:Tab("Main")
+local HoleTAB = Windows:Tab("BlackHole")
+local MovementTAB = Windows:Tab("Movement")
+local ModifyTAB = Windows:Tab("Modifications")
+local CreditsTAB = Windows:Tab("Credits")
+
+-- [ SERVICE'S ] --
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local startTime = tick()
+
+local Stats = game:GetService("Stats")
+
+-- [ FUNCTION'S ] --
+
+local function SendNotify(title, message, duration)
+	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration, Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
+end
+
+-- [ BLACK HOLE FUCTION'S ] ---
+
+local angle = 1
+local radius = 10
+local angleSpeed = 2
+local blackHoleActive = false
+
+local function setupPlayer()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    local Folder = Instance.new("Folder", Workspace)
+    local Part = Instance.new("Part", Folder)
+    local Attachment1 = Instance.new("Attachment", Part)
+    Part.Anchored = true
+    Part.CanCollide = false
+    Part.Transparency = 1
+
+    return humanoidRootPart, Attachment1
+end
+
+local humanoidRootPart, Attachment1 = setupPlayer()
+
+if not getgenv().Network then
+    getgenv().Network = {
+        BaseParts = {},
+        Velocity = Vector3.new(14.46262424, 14.46262424, 14.46262424)
+    }
+
+    Network.RetainPart = function(part)
+        if typeof(part) == "Instance" and part:IsA("BasePart") and part:IsDescendantOf(Workspace) then
+            table.insert(Network.BaseParts, part)
+            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
+            part.CanCollide = false
+        end
+    end
+
+    local function EnablePartControl()
+        LocalPlayer.ReplicationFocus = Workspace
+        RunService.Heartbeat:Connect(function()
+            sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
+            for _, part in pairs(Network.BaseParts) do
+                if part:IsDescendantOf(Workspace) then
+                    part.Velocity = Network.Velocity
+                end
+            end
+        end)
+    end
+
+    EnablePartControl()
+end
+
+local function ForcePart(v)
+    if v:IsA("Part") and not v.Anchored and not v.Parent:FindFirstChild("Humanoid") and not v.Parent:FindFirstChild("Head") and v.Name ~= "Handle" then
+        for _, x in next, v:GetChildren() do
+            if x:IsA("BodyAngularVelocity") or x:IsA("BodyForce") or x:IsA("BodyGyro") or x:IsA("BodyPosition") or x:IsA("BodyThrust") or x:IsA("BodyVelocity") or x:IsA("RocketPropulsion") then
+                x:Destroy()
+            end
+        end
+        if v:FindFirstChild("Attachment") then
+            v:FindFirstChild("Attachment"):Destroy()
+        end
+        if v:FindFirstChild("AlignPosition") then
+            v:FindFirstChild("AlignPosition"):Destroy()
+        end
+        if v:FindFirstChild("Torque") then
+            v:FindFirstChild("Torque"):Destroy()
+        end
+        v.CanCollide = false
+
+        local Torque = Instance.new("Torque", v)
+        Torque.Torque = Vector3.new(1000000, 1000000, 1000000)
+        local AlignPosition = Instance.new("AlignPosition", v)
+        local Attachment2 = Instance.new("Attachment", v)
+        Torque.Attachment0 = Attachment2
+        AlignPosition.MaxForce = math.huge
+        AlignPosition.MaxVelocity = math.huge
+        AlignPosition.Responsiveness = 500
+        AlignPosition.Attachment0 = Attachment2
+        AlignPosition.Attachment1 = Attachment1
+    end
+end
+
+local function toggleBlackHole()
+    if blackHoleActive then
+        for _, v in next, Workspace:GetDescendants() do
+            ForcePart(v)
+        end
+
+        Workspace.DescendantAdded:Connect(function(v)
+            if blackHoleActive then
+                ForcePart(v)
+            end
+        end)
+
+        spawn(function()
+            while blackHoleActive and RunService.RenderStepped:Wait() do
+                angle = angle + math.rad(angleSpeed)
+
+                local offsetX = math.cos(angle) * radius
+                local offsetZ = math.sin(angle) * radius
+
+                Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
+            end
+        end)
+    else
+        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function()
+    humanoidRootPart, Attachment1 = setupPlayer()
+    if blackHoleActive then
+        toggleBlackHole()
+    end
+end)
+
+-- [ TAB #1  -  HOME ] --
+
+HomeTAB:LabelModify(" ・ Game Time: ", function()
+    local elapsedTime = math.floor(tick() - startTime)
+    local hours = math.floor(elapsedTime / 3600)
+    local minutes = math.floor((elapsedTime % 3600) / 60)
+    local seconds = elapsedTime % 60
+    return string.format(" ・ Game Time: %02d:%02d:%02d", hours, minutes, seconds)
+end)
+
+HomeTAB:LabelModify(" ・ Current Time: ", function()
+    return " ・ Current Time: " .. DateTime.now():FormatLocalTime("h:mm:ss A", "en-us")
+end)
+
+HomeTAB:LabelModify(" ・ Current Players: ", function()
+    return " ・ Current Players: " .. (#game:GetService("Players"):GetPlayers() or #game:GetService("Players"):GetChildren())
+end)
+
+HomeTAB:LabelModify(" ・ Ping: ", function()
+    local ping = tonumber(string.split(Stats["Network"]["ServerStatsItem"]["Data Ping"]:GetValueString(), " ")[1])
+    return " ・ Ping: " .. ping
+end)
+
+HomeTAB:LabelModify(" ・ FPS: ", function()
+    local fps = math.floor(workspace:GetRealPhysicsFPS())
+    return " ・ FPS: " .. fps .. "/R"
+end)
+
+-- [ TAB #2  -  MAIN ] --
+
+MainTAB:Button(" ・ Disable Fall Damage", function()
+	local runsvc = game:GetService("RunService")
+    local heartbeat = runsvc.Heartbeat
+    local rstepped = runsvc.RenderStepped
+
+    local lp = game.Players.LocalPlayer
+    local novel = Vector3.new(0, 0, 0)
+
+    local function nofalldamage(chr)
+        local root = chr:WaitForChild("HumanoidRootPart")
+        if root then
+            local con
+            con = heartbeat:Connect(function()
+                if not root.Parent then
+                    con:Disconnect()
+                end
+
+                local oldvel = root.AssemblyLinearVelocity
+                root.AssemblyLinearVelocity = novel
+
+                rstepped:Wait()
+                root.AssemblyLinearVelocity = oldvel
+            end)
+        end
+    end
+    nofalldamage(lp.Character)
+    lp.CharacterAdded:Connect(nofalldamage)
+end)
+
+--[[MainTAB:Button(" ・ Remove Sandstorm & Blizzard UI", function()
+	local sandStormUI = game.Players.LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("SandStormGui")
+    local blizzardUI = game.Players.LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("BlizzardGui")
+
+    if sandStormUI then
+        sandStormUI:Destroy()
+    end
+    if blizzardUI then
+        blizzardUI:Destroy()
+    end
+end)--]]
+
+MainTAB:Button(" ・ Current Disaster", function()
+	ImperiumLib:Notification("Notification", "The current disaster are "..game.Players.LocalPlayer.Character.SurvivalTag.Value, "Okay!")
+end)
+
+--[[MainTAB:Button(" ・ Lunch Rocket", function()
+	local consoleUpper = workspace.Structure["Launch Land"].RocketStand.ConsoleUpper.ReleaseButtonUpper
+    local consoleLower = workspace.Structure["Launch Land"].RocketStand.ConsoleLower.ReleaseButtonLower
+    local loadingTower = workspace.Structure["Launch Land"].LoadingTower.Console.ReleaseEntryBridge
+    local rocketActive = workspace.Structure["Launch Land"].["SPACESHIP!!"].Shuttle.IgnitionButton
+
+    local clickDetectorUpper = consoleUpper:FindFirstChildOfClass("ClickDetector")
+    local clickDetectorLower = consoleLower:FindFirstChildOfClass("ClickDetector")
+    local clickDetectorLoadingTower = loadingTower:FindFirstChildOfClass("ClickDetector")
+    local clickDetectorRocketActive = rocketActive:FindFirstChildOfClass("ClickDetector")
+
+    if clickDetectorUpper then
+        clickDetectorUpper:FireClick()
+    end
+    if clickDetectorLower then
+        clickDetectorLower:FireClick()
+    end
+    if clickDetectorLoadingTower then
+        clickDetectorLoadingTower:FireClick()
+    end
+    if clickDetectorRocketActive then
+        clickDetectorRocketActive:FireClick()
+    end
+end)--]]
+
+MainTAB:Button(" ・ Become Prisoner", function()
+    local shirtId = 903178177
+    local pantsId = 3810825286
+
+    local function applyClothes()
+        for _, item in ipairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if item:IsA("Shirt") or item:IsA("Pants") then
+                item:Destroy()
+            end
+        end
+        local newShirt = Instance.new("Shirt")
+        newShirt.ShirtTemplate = "rbxassetid://" .. shirtId
+        newShirt.Parent = game.Players.LocalPlayer.Character
+        local newPants = Instance.new("Pants")
+        newPants.PantsTemplate = "rbxassetid://" .. pantsId
+        newPants.Parent = game.Players.LocalPlayer.Character
+    end
+    applyClothes()
+end)
+
+MainTAB:Toggle(" ・ Walk On Water", false, function(value)
+	if value == false then 
+		game.Workspace.WaterLevel.CanCollide = false
+		game.Workspace.WaterLevel.Size = Vector3.new(10, 1, 10)
+	else 
+		game.Workspace.WaterLevel.CanCollide = true
+		game.Workspace.WaterLevel.Size = Vector3.new(1000, 1, 1000)
+	end
+end)
+
+MainTAB:Toggle(" ・ Autofarm", false, function(value)
+	if value then
+		local runService = game:GetService("RunService")
+			event = runService.RenderStepped:Connect(function()
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-264, 195, 288)
+					end)
+						if game.Players.LocalPlayer.Character.FallDamageScript then
+					game.Players.LocalPlayer.Character.FallDamageScript:Destroy()
+				end
+			end
+	if not value then
+		event:Disconnect()
+	end
+end)
+
+-- [ TAB #3  -  BLACKHOLE ] --
+
+HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
+	radius = value
+end)
+
+HoleTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value) 
+    angleSpeed = value
+end)
+ 
+HoleTAB:Toggle(" ・ Enable BlackHole", false, function(value)
+    blackHoleActive = value
+    if blackHoleActive then
+        toggleBlackHole()
+    end
+end)
+
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if blackHoleActive then
+            angle = angle + math.rad(angleSpeed)
+        end
+    end
+end)
+
+-- [ TAB #4  -  MOVEMENT ] --
+
+MovementTAB:Slider(" ・ Set WalkSpeed", 5, 200, 16, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+MovementTAB:Slider(" ・ Set JumpPower", 5, 200, 50, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+end)
+
+MovementTAB:Slider(" ・ Set Gravity", 5, 1000, 196, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.Gravity = value
+end)
+
+-- [ TAB #5  -  MODIFICATIONS ] --
+
+ModifyTAB:ColorpickerAlways(" ・ Water Color", Color3.fromRGB(0, 170, 255), function(t)
+	local brickColor = BrickColor.new(t)
+
+    game.Workspace.WaterLevel.BrickColor = brickColor
+	game.Workspace.Structure.FloodLevel.BrickColor = brickColor
+
+	local Children = game.Workspace.TsunamiWave:GetChildren()
+	for _, child in ipairs(Children) do
+        if child:IsA("BasePart") then
+            child.BrickColor = brickColor
+        end
+    end
+end)
+
+ModifyTAB:Toggle(" ・ Dark Mode", false, function(value)
+	if value == false then
+		game:GetService("Lighting").ClockTime = 14
+		game.Workspace.WaterLevel.BrickColor = BrickColor.new("Bright blue")
+		game.Workspace.Structure.Cloud.BrickColor = BrickColor.new("Sand blue")
+		game.Workspace.Structure.FloodLevel.BrickColor = BrickColor.new("Bright blue")
+		local Children = game.Workspace.TsunamiWave:GetChildren()
+		for a = 1, #Children do
+			Children[a].BrickColor = BrickColor.new("Bright blue")
+		end
+	else
+		game:GetService("Lighting").ClockTime = 4
+		game.Workspace.WaterLevel.BrickColor = BrickColor.new("Black")
+		game.Workspace.Structure.Cloud.BrickColor = BrickColor.new("Black")
+		game.Workspace.Structure.FloodLevel.BrickColor = BrickColor.new("Black")
+		local Children = game.Workspace.TsunamiWave:GetChildren()
+		for a = 1, #Children do
+			Children[a].BrickColor = BrickColor.new("Black")
+		end
+	end
+end)
+
+ModifyTAB:Button(" ・ Remove ADS", function()
+	game:GetService("Workspace").BillboardAd:Destroy()
+    game:GetService("Workspace").ForwardPortal:Destroy()
+    game:GetService("Workspace").ReturnPortal:Destroy()
+end)
+
+-- [ TAB #6  -  CREDITS ] --
+
+CreditsTAB:Label("  >  Owner   :  @donfushii")
+CreditsTAB:Label("  >  Tester    :  @ImperiumClothes")
+
+CreditsTAB:Button(" ・ Copy Discord", function()
+	setclipboard("discord.gg/UBcYG3sA")
+end)
+
+CreditsTAB:Colorpicker(" ・ UI Color", Color3.fromRGB(245, 102, 154), function(t)
+    ImperiumLib:ChangePresetColor(Color3.fromRGB(t.R * 255, t.G * 255, t.B * 255))
+end)
