@@ -23,28 +23,48 @@ local function markPlayerUsingScript(playerId)
     end
 end
 
+local function updateDisplayName(player)
+    local humanoid = player.Character and player.Character:FindFirstChildWhichIsA('Humanoid')
+    if humanoid then
+        local plrID = player.UserId
+        if table.find(ADMINS, plrID) then
+            humanoid.DisplayName = ('[🦇] ' .. player.DisplayName)
+        elseif table.find(MODS, plrID) then
+            humanoid.DisplayName = ('[👑] ' .. player.DisplayName)
+        elseif table.find(STARS, plrID) then
+            humanoid.DisplayName = ('[⭐] ' .. player.DisplayName)
+        elseif table.find(playersUsingScript, plrID) then
+            humanoid.DisplayName = ('[😎] ' .. player.DisplayName)
+        end
+    end
+end
+
 local function ImperiumEmojis()
     for _, player in pairs(game.Players:GetPlayers()) do
-        local humanoid = player.Character and player.Character:FindFirstChildWhichIsA('Humanoid')
-        if humanoid then
-            local plrID = player.UserId
-            if table.find(ADMINS, plrID) then
-                humanoid.DisplayName = ('[\229\145\190] ' .. player.DisplayName)
-            elseif table.find(MODS, plrID) then
-                humanoid.DisplayName = ('[\240\159\145\140] ' .. player.DisplayName)
-            elseif table.find(STARS, plrID) then
-                humanoid.DisplayName = ('[\239\184\143] ' .. player.DisplayName)
-            elseif table.find(playersUsingScript, plrID) then
-                humanoid.DisplayName = ('[\229\144\173] ' .. player.DisplayName)
-            end
-        end
+        updateDisplayName(player)
     end
 end
 
 local localPlayer = game.Players.LocalPlayer
 markPlayerUsingScript(localPlayer.UserId)
 
+localPlayer.CharacterAdded:Connect(function()
+    updateDisplayName(localPlayer)
+end)
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    player.CharacterAdded:Connect(function()
+        updateDisplayName(player)
+    end)
+end
+
 local succ, errr = pcall(ImperiumEmojis)
 if not succ then
     warn("> Imperium  |  Error  •  While executing Name Emojis: " .. errr)
 end
+
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        updateDisplayName(player)
+    end)
+end)
