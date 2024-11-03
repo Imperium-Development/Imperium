@@ -39,8 +39,16 @@ local function updateDisplayName(player)
     end
 end
 
+local function onCharacterAdded(player)
+    player.CharacterAdded:Connect(function(character)
+        local humanoid = character:WaitForChild('Humanoid')
+        updateDisplayName(player)
+    end)
+end
+
 local function ImperiumEmojis()
     for _, player in pairs(game.Players:GetPlayers()) do
+        onCharacterAdded(player)
         updateDisplayName(player)
     end
 end
@@ -52,19 +60,11 @@ localPlayer.CharacterAdded:Connect(function()
     updateDisplayName(localPlayer)
 end)
 
-for _, player in pairs(game.Players:GetPlayers()) do
-    player.CharacterAdded:Connect(function()
-        updateDisplayName(player)
-    end)
-end
+game.Players.PlayerAdded:Connect(function(player)
+    onCharacterAdded(player)
+end)
 
 local succ, errr = pcall(ImperiumEmojis)
 if not succ then
     warn("> Imperium  |  Error  •  While executing Name Emojis: " .. errr)
 end
-
-game.Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        updateDisplayName(player)
-    end)
-end)
