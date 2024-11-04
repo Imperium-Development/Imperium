@@ -306,25 +306,6 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
-local isFlying = false
-local flySpeed = 5
-
-MainTAB:Slider(" ・ Fly Speed", 1, 20, flySpeed, function(value)
-    flySpeed = value
-    if isFlying then
-        lib:startFly(false, flySpeed, flySpeed)
-    end
-end)
-
-MainTAB:Toggle(" ・ Enable Fly", false, function(value)
-    isFlying = value
-    if isFlying then
-        lib:startFly(false, flySpeed, flySpeed)
-    else
-        lib:stopFly()
-    end
-end)
-
 -- [ TAB #3  -  BLACKHOLE ] --
 
 HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
@@ -348,6 +329,116 @@ spawn(function()
         if blackHoleActive then
             angle = angle + math.rad(angleSpeed)
         end
+    end
+end)
+
+local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
+
+local function getHiddenProperty(obj, propName)
+    if sethidden then
+        return gethiddenproperty(obj, propName)
+    else
+        warn("Este exploit no soporta gethiddenproperty.")
+        return nil
+    end
+end
+
+local var = {
+    sradius = getHiddenProperty(LocalPlayer, "SimulationRadius") or 0,
+    styles = "Normal",
+    player = nil,
+    tpua = false
+}
+
+local rotate = 0
+
+HoleTAB:Toggle("Loop teleport unanchored to player", false, function(value)
+    var.tpua = value
+    if value == true then
+        sethidden(LocalPlayer, "SimulationRadius", 1/0)
+    else
+        sethidden(LocalPlayer, "SimulationRadius", var.sradius)
+        rotate = 0
+    end
+end)
+
+HoleTAB:Button("Teleport unanchored to player", function()
+    lib:TrackPlayer(var.player, function(v)
+        if sethidden then
+            rotate = rotate + 1
+            sethidden(LocalPlayer, "SimulationRadius", 1/0)
+            lib:descendant(workspace, function(part)
+                if v.Character:FindFirstChild("Head") and part:IsA("BasePart") or part:IsA("UnionOperation") or part:IsA("Model") and part.Anchored == false and not part:IsDescendantOf(LocalPlayer.Character) and part.Name ~= "Torso" and part.Name ~= "Head" and part.Name ~= "Right Arm" and part.Name ~= "Left Arm" and part.Name ~= "Right Leg" and part.Name ~= "Left Leg" and part.Name ~= "HumanoidRootPart" then
+                    if part:IsA("BodyPosition") or part:IsA("BodyGyro") then
+                        part:Destroy()
+                    end
+                    local ForceInstance = Instance.new("BodyPosition")
+                    ForceInstance.Parent = part
+                    ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                    lib:children(part, function(c)
+                        if c:IsA("BasePart") or c:IsA("UnionOperation") or c:IsA("Model") then
+                            if var.styles == "Normal" then
+                                c.Position = v.Character.Head.Position
+                            elseif var.styles == "Spin" then
+                                c.Position = (CFrame.new(v.Character.Head.Position) * CFrame.Angles(0, math.rad(rotate), 0)).Position
+                            elseif var.styles == "Ring" then
+                                c.Position = v.Character.Head.Position + Vector3.new(math.sin(tick()) * 5, 0, math.cos(tick()) * 5)
+                            elseif var.styles == "Ring & Spin" then
+                                c.Position = (CFrame.new(v.Character.Head.Position) * CFrame.Angles(0, math.rad(rotate), 0)).Position + Vector3.new(math.sin(tick()) * 5, 0, math.cos(tick()) * 5)
+                            end
+                        end
+                    end)
+                end
+            end)
+        else
+            warn("Este exploit no soporta sethiddenproperty.")
+        end
+    end)
+end)
+
+HoleTAB:Dropdown("Unanchored teleport styles", {"Normal", "Spin", "Ring", "Ring & Spin"}, function(value)
+    var.styles = value
+end)
+
+HoleTAB:Textbox("Victim name", false, function(value)
+    lib:TrackPlayer(value, function(v)
+        var.player = v.Name
+    end)
+end)
+
+lib:runtime(function()
+    if var.tpua == true then
+        lib:TrackPlayer(var.player, function(v)
+            if sethidden then
+                rotate = rotate + 1
+                lib:descendant(workspace, function(part)
+                    if v.Character:FindFirstChild("Head") and part:IsA("BasePart") or part:IsA("UnionOperation") or part:IsA("Model") and part.Anchored == false and not part:IsDescendantOf(LocalPlayer.Character) and part.Name ~= "Torso" and part.Name ~= "Head" and part.Name ~= "Right Arm" and part.Name ~= "Left Arm" and part.Name ~= "Right Leg" and part.Name ~= "Left Leg" and part.Name ~= "HumanoidRootPart" then
+                        if part:IsA("BodyPosition") or part:IsA("BodyGyro") then
+                            part:Destroy()
+                        end
+                        local ForceInstance = Instance.new("BodyPosition")
+                        ForceInstance.Parent = part
+                        ForceInstance.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                        lib:children(part, function(c)
+                            if c:IsA("BasePart") or c:IsA("UnionOperation") or c:IsA("Model") then
+                                if var.styles == "Normal" then
+                                    c.Position = v.Character.Head.Position
+                                elseif var.styles == "Spin" then
+                                    c.Position = (CFrame.new(v.Character.Head.Position) * CFrame.Angles(0, math.rad(rotate), 0)).Position
+                                elseif var.styles == "Ring" then
+                                    c.Position = v.Character.Head.Position + Vector3.new(math.sin(tick()) * 5, 0, math.cos(tick()) * 5)
+                                elseif var.styles == "Ring & Spin" then
+                                    c.Position = (CFrame.new(v.Character.Head.Position) * CFrame.Angles(0, math.rad(rotate), 0)).Position + Vector3.new(math.sin(tick()) * 5, 0, math.cos(tick()) * 5)
+                                end
+                            end
+                        end)
+                    end
+                end)
+            else
+                warn("Este exploit no soporta sethiddenproperty.")
+                touamet:Set(false)
+            end
+        end)
     end
 end)
 
