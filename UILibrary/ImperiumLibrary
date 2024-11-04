@@ -303,6 +303,11 @@ end
 
 -- [ FLY EVENT ] --
 
+local velocityHandlerName = lib.randomString()
+local gyroHandlerName = lib.randomString()
+local mfly1 = nil
+local mfly2 = nil
+
 function lib:unmobilefly()
 	pcall(function()
 		FLYING = false
