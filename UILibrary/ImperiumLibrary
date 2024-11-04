@@ -23,13 +23,6 @@ local Mouse = LocalPlayer:GetMouse()
 
 local PresetColor = Color3.fromRGB(44, 120, 224)
 local CloseBind = Enum.KeyCode.RightControl
-
-local iyflyspeed = 1
-local vehicleflyspeed = 1
-local FLYING = false
-local flyKeyDown = nil
-local flyKeyUp = nil
-
 local isGuiOpened = true
 
 local ui = Instance.new("ScreenGui")
@@ -268,6 +261,32 @@ function lib:Queue_On_Teleport(str)
     end
 end
 
+function lib:GetPlayer(f)
+	for i,v in pairs(game.Players:GetPlayers()) do
+		if v.Name ~= LocalPlayer.Name then
+			if v.UserId ~= 5127756688 then
+				f(v)
+			end
+		end
+	end
+end
+
+function lib:TrackPlayer(name,f)
+	if name ~= "me" or name ~= "Me" then
+		lib:GetPlayer(function(v)
+			if name == "all" or name == "All" then
+				f(v)
+			else
+				if (string.sub(string.lower(v.Name),1,string.len(name))) == string.lower(name) or (string.sub(string.lower(v.DisplayName),1,string.len(name))) == string.lower(name) then
+					f(v)
+				end
+			end
+		end)
+	else
+		f(LocalPlayer)
+	end
+end
+
 -- [ CURRENT HOUR ] --
 
 local updatedDate = MarketplaceService:GetProductInfo(game.PlaceId).Updated
@@ -299,229 +318,6 @@ function lib:SetTitle(titleText)
     if self.Title then
         self.Title.Text = titleText
     end
-end
-
--- [ FLY EVENT ] --
-
-local velocityHandlerName = lib.randomString()
-local gyroHandlerName = lib.randomString()
-local mfly1 = nil
-local mfly2 = nil
-
-function lib:unmobilefly()
-	pcall(function()
-		FLYING = false
-		LocalPlayer.Character.HumanoidRootPart:FindFirstChild(gyroHandlerName):Destroy()
-		LocalPlayer.Character.HumanoidRootPart:FindFirstChild(velocityHandlerName):Destroy()
-		LocalPlayer.Character.Humanoid.PlatformStand = false
-		mfly1:Disconnect()
-		mfly2:Disconnect()
-	end)
-end
-
-function lib:mobilefly(vfly)
-	lib:unmobilefly()
-	FLYING = true
-
-	local v3none = Vector3.new()
-	local v3zero = Vector3.new(0,0,0)
-	local v3inf = Vector3.new(9e9,9e9,9e9)
-
-	local bv = Instance.new("BodyVelocity")
-	bv.Name = velocityHandlerName
-	bv.Parent = LocalPlayer.Character.HumanoidRootPart
-	bv.MaxForce = Vector3.new(0,0,0)
-	bv.Velocity = Vector3.new(0,0,0)
-
-	local bg = Instance.new("BodyGyro")
-	bg.Name = gyroHandlerName
-	bg.Parent = LocalPlayer.Character.HumanoidRootPart
-	bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
-	bg.P = 1000
-	bg.D = 50
-
-	mfly1 = LocalPlayer.CharacterAdded:Connect(function()
-		local bv = Instance.new("BodyVelocity")
-		bv.Name = velocityHandlerName
-		bv.Parent = LocalPlayer.Character.HumanoidRootPart
-		bv.MaxForce = Vector3.new(0,0,0)
-		bv.Velocity = Vector3.new(0,0,0)
-
-		local bg = Instance.new("BodyGyro")
-		bg.Name = gyroHandlerName
-		bg.Parent = LocalPlayer.Character.HumanoidRootPart
-		bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
-		bg.P = 1000
-		bg.D = 50
-	end)
-
-	mfly2 = RunService.RenderStepped:Connect(function()
-		if LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid") and LocalPlayer.Character.HumanoidRootPart and LocalPlayer.Character.HumanoidRootPart:FindFirstChild(velocityHandlerName) and LocalPlayer.Character.HumanoidRootPart:FindFirstChild(gyroHandlerName) then
-			LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].MaxForce = Vector3.new(9e9,9e9,9e9)
-			LocalPlayer.Character.HumanoidRootPart[gyroHandlerName].MaxTorque = Vector3.new(9e9,9e9,9e9)
-			if vfly == false then
-				LocalPlayer.Character.Humanoid.PlatformStand = true
-			end
-			LocalPlayer.Character.HumanoidRootPart[gyroHandlerName].CFrame = workspace.CurrentCamera.CoordinateFrame
-			LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity = Vector3.new()
-
-			if controlModule:GetMoveVector().X > 0 then
-				LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity = LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity + workspace.CurrentCamera.CFrame.RightVector * (controlModule:GetMoveVector().X * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
-			end
-			if controlModule:GetMoveVector().X < 0 then
-				LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity = LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity + workspace.CurrentCamera.CFrame.RightVector * (controlModule:GetMoveVector().X * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
-			end
-			if controlModule:GetMoveVector().Z > 0 then
-				LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity = LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity - workspace.CurrentCamera.CFrame.LookVector * (controlModule:GetMoveVector().Z * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
-			end
-			if controlModule:GetMoveVector().Z < 0 then
-				LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity = LocalPlayer.Character.HumanoidRootPart[velocityHandlerName].Velocity - workspace.CurrentCamera.CFrame.LookVector * (controlModule:GetMoveVector().Z * ((vfly and vehicleflyspeed or iyflyspeed) * 50))
-			end
-		end
-	end)
-end
-
-local function FLY(vfly,tweenbool,tweenspeed)
-	repeat wait() until LocalPlayer and LocalPlayer.Character and Players.LocalPlayer.Character.HumanoidRootPart and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-	repeat wait() until Mouse
-	if flyKeyDown or flyKeyUp then
-		flyKeyDown:Disconnect()
-		flyKeyUp:Disconnect()
-	end
-
-	local T = LocalPlayer.Character.HumanoidRoodPart
-	local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-	local SPEED = 0
-
-	local function FLY()
-		FLYING = true
-		local BG = Instance.new('BodyGyro')
-		local BV = Instance.new('BodyVelocity')
-		BG.P = 9e4
-		BG.Parent = T
-		BV.Parent = T
-		BG.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-		BG.cframe = T.CFrame
-		BV.velocity = Vector3.new(0, 0, 0)
-		BV.maxForce = Vector3.new(9e9, 9e9, 9e9)
-		task.spawn(function()
-			repeat wait()
-				if vfly == false and LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-					if game.PlaceId == 277751860 then -- Epic Minigames
-						if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") and LocalPlayer.Character.HumanoidRootPart then
-							local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-							local root = LocalPlayer.Character.HumanoidRootPart
-							hum:ChangeState(0)
-							root.Velocity = root.CFrame.LookVector * 30
-						end
-					else
-						LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
-					end
-				end
-				if CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0 then
-					SPEED = 50
-				elseif not (CONTROL.L + CONTROL.R ~= 0 or CONTROL.F + CONTROL.B ~= 0 or CONTROL.Q + CONTROL.E ~= 0) and SPEED ~= 0 then
-					SPEED = 0
-				end
-				if (CONTROL.L + CONTROL.R) ~= 0 or (CONTROL.F + CONTROL.B) ~= 0 or (CONTROL.Q + CONTROL.E) ~= 0 then
-					if tweenbool == false then
-						BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R, (CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-					else
-						TweenService:Create(BV,TweenInfo.new(tweenspeed,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (CONTROL.F + CONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(CONTROL.L + CONTROL.R,(CONTROL.F + CONTROL.B + CONTROL.Q + CONTROL.E) * 0.2,0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED}):Play()
-					end
-					lCONTROL = {F = CONTROL.F, B = CONTROL.B, L = CONTROL.L, R = CONTROL.R}
-				elseif (CONTROL.L + CONTROL.R) == 0 and (CONTROL.F + CONTROL.B) == 0 and (CONTROL.Q + CONTROL.E) == 0 and SPEED ~= 0 then
-					if tweenbool == false then
-						BV.velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R, (lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2, 0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED
-					else 
-						TweenService:Create(BV,TweenInfo.new(tweenspeed,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{velocity = ((workspace.CurrentCamera.CoordinateFrame.lookVector * (lCONTROL.F + lCONTROL.B)) + ((workspace.CurrentCamera.CoordinateFrame * CFrame.new(lCONTROL.L + lCONTROL.R,(lCONTROL.F + lCONTROL.B + CONTROL.Q + CONTROL.E) * 0.2,0).p) - workspace.CurrentCamera.CoordinateFrame.p)) * SPEED}):Play()
-					end
-				else
-					BV.velocity = Vector3.new(0,0,0)
-				end
-				if tweenbool == false then
-					TweenService:Create(BG,TweenInfo.new(0.01,Enum.EasingStyle.Linear,Enum.EasingDirection.Out,0,false,0),{cframe = workspace.CurrentCamera.CoordinateFrame}):Play()
-				else
-					BG.cframe = workspace.CurrentCamera.CoordinateFrame
-				end
-			until FLYING == false -- not
-			CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			lCONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
-			SPEED = 0
-			BG:Destroy()
-			BV:Destroy()
-			if LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-				LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-			end
-		end)
-	end
-	flyKeyDown = Mouse.KeyDown:Connect(function(KEY)
-		if KEY:lower() == 'w' then
-			CONTROL.F = (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 's' then
-			CONTROL.B = - (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 'a' then
-			CONTROL.L = - (vfly and vehicleflyspeed or iyflyspeed)
-		elseif KEY:lower() == 'd' then 
-			CONTROL.R = (vfly and vehicleflyspeed or iyflyspeed)
-		elseif QEfly and KEY:lower() == 'e' then
-			CONTROL.Q = (vfly and vehicleflyspeed or iyflyspeed)*2
-		elseif QEfly and KEY:lower() == 'q' then
-			CONTROL.E = -(vfly and vehicleflyspeed or iyflyspeed)*2
-		end
-		pcall(function()
-			workspace.CurrentCamera.CameraType = Enum.CameraType.Track
-		end)
-	end)
-	flyKeyUp = Mouse.KeyUp:Connect(function(KEY)
-		if KEY:lower() == 'w' then
-			CONTROL.F = 0
-		elseif KEY:lower() == 's' then
-			CONTROL.B = 0
-		elseif KEY:lower() == 'a' then
-			CONTROL.L = 0
-		elseif KEY:lower() == 'd' then
-			CONTROL.R = 0
-		elseif KEY:lower() == 'e' then
-			CONTROL.Q = 0
-		elseif KEY:lower() == 'q' then
-			CONTROL.E = 0
-		end
-	end)
-	FLY()
-end
-
-local function NOFLY()
-	FLYING = false
-	if flyKeyDown or flyKeyUp then
-		flyKeyDown:Disconnect()
-		flyKeyUp:Disconnect()
-	end
-	if LocalPlayer.Character:FindFirstChildOfClass('Humanoid') then
-		LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-	end
-	pcall(function()
-		workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
-	end)
-end
-
-function lib:startFly(vfly, fspeed, vspeed)
-	iyflyspeed = fspeed or 1
-	vehicleflyspeed = vspeed or 1
-	if table.find({Enum.Platform.IOS,Enum.Platform.Android},UserInputService:GetPlatform()) then
-		lib:mobilefly(vfly)
-	else
-		FLY(vfly, false, 0)
-	end
-end
-
-function lib:stopFly()
-	if table.find({Enum.Platform.IOS,Enum.Platform.Android},UserInputService:GetPlatform()) then
-		lib:unmobilefly()
-	else
-		NOFLY()
-	end
 end
 
 function lib:Window(text, preset, closebind)
