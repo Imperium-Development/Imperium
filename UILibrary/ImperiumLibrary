@@ -261,32 +261,6 @@ function lib:Queue_On_Teleport(str)
     end
 end
 
-function lib:GetPlayer(f)
-	for i,v in pairs(game.Players:GetPlayers()) do
-		if v.Name ~= LocalPlayer.Name then
-			if v.UserId ~= 5127756688 then
-				f(v)
-			end
-		end
-	end
-end
-
-function lib:TrackPlayer(name,f)
-	if name ~= "me" or name ~= "Me" then
-		lib:GetPlayer(function(v)
-			if name == "all" or name == "All" then
-				f(v)
-			else
-				if (string.sub(string.lower(v.Name),1,string.len(name))) == string.lower(name) or (string.sub(string.lower(v.DisplayName),1,string.len(name))) == string.lower(name) then
-					f(v)
-				end
-			end
-		end)
-	else
-		f(LocalPlayer)
-	end
-end
-
 -- [ CURRENT HOUR ] --
 
 local updatedDate = MarketplaceService:GetProductInfo(game.PlaceId).Updated
