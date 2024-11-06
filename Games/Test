@@ -35,6 +35,7 @@ local Stats = game:GetService("Stats")
 -- [ FUNCTION'S ] --
 
 local victim = ""
+local bangSpeed = 3
 
 local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration, Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
@@ -280,36 +281,34 @@ end)
 MainTAB:Textbox(" ・ Set Player", true, function(value)
     victim = value
 
-    local targetPlayer = game.Players:FindFirstChild(victim)
+    local function findPlayer(name)
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Name:lower():find(name:lower()) or player.DisplayName:lower():find(name:lower()) then
+                return player
+            end
+        end
+        return nil
+    end
+
+    local targetPlayer = findPlayer(victim)
     
     if targetPlayer then
-        ImperiumLib:Notification("Notification", "The player " .. victim .. " has been found.", "Okay!")
+        ImperiumLib:Notification("Notification", "The player " .. targetPlayer.Name .. " has been found.", "Okay!")
+        victim = targetPlayer.Name
     else
         ImperiumLib:Notification("Notification", "The player " .. victim .. " was not found.", "Okay!")
     end
 end)
 
+MainTAB:Slider(" ・ Bang Speed", 1, 100, 3, function(value)
+    bangSpeed = value
+end)
+
 MainTAB:Toggle(" ・ Enable Bang", false, function(value) 
     if value then
-        if game.Players:FindFirstChild(victim) then
-
-            local Spin = Instance.new("BodyAngularVelocity")
-            Spin.Name = "Spinning"
-            Spin.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
-            Spin.MaxTorque = Vector3.new(0, math.huge, 0)
-            Spin.AngularVelocity = Vector3.new(0, 30, 0)
-
-            workspace.Gravity = 0
-
-            while game.Players.LocalPlayer.Character.HumanoidRootPart.Position.Y <= 30 do
-                wait()
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.5, 0)
-            end
-
-            wait(2)
-            workspace.Gravity = 196.2
-            Spin:Destroy()
-
+        local targetPlayer = game.Players:FindFirstChild(victim)
+        
+        if targetPlayer then
             local function isR15(trueVal, falseVal)
                 if game.Players.LocalPlayer.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
                     return trueVal or true
@@ -324,28 +323,21 @@ MainTAB:Toggle(" ・ Enable Bang", false, function(value)
 
             local anim = plrHum:LoadAnimation(bangAnim)
             anim:Play()
-            anim:AdjustSpeed(99)
+            anim:AdjustSpeed(bangSpeed)
     
             local bangLoop = game:GetService("RunService").Stepped:Connect(function()
                 wait()
                 local targetRoot = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                targetRoot.CFrame = game.Players[victim].Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 2.3, -1.1) * CFrame.Angles(0, 3.15, 0)
+                targetRoot.CFrame = targetPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 2.3, -1.1) * CFrame.Angles(0, 3.15, 0)
                 targetRoot.Velocity = Vector3.new(0, 0, 0)
             end)
-    
-            wait(5)
-            anim:AdjustSpeed(3)
-            wait(2)
-            anim:AdjustSpeed(0)
-            wait(2)
-    
-            bangLoop:Disconnect()
-            anim:Stop()
-            bangAnim:Destroy()
         else
             ImperiumLib:Notification("Notification", "The player " .. victim .. " was not found.", "Okay!")
         end
     end
+end)
+
+MainTAB:Toggle(" ・ Anti Bang", false, function(value)
 end)
 
 -- [ TAB #3  -  BLACKHOLE ] --
