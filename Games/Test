@@ -17,7 +17,7 @@ local HomeTAB = Windows:Tab("Home")
 local MainTAB = Windows:Tab("Main")
 local HoleTAB = Windows:Tab("BlackHole")
 local MovementTAB = Windows:Tab("Movement")
-local ModifyTAB = Windows:Tab("Modifications")
+local MiscTAB = Windows:Tab("Misc")
 local CreditsTAB = Windows:Tab("Credits")
 
 -- [ SERVICE'S ] --
@@ -36,6 +36,7 @@ local Stats = game:GetService("Stats")
 
 local victim = ""
 local bangSpeed = 3
+local bangLoop
 
 local function SendNotify(title, message, duration)
 	game:GetService("StarterGui"):SetCore("SendNotification", {Title = title, Text = message, Duration = duration, Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
@@ -278,6 +279,62 @@ MainTAB:Toggle(" ・ Autofarm", false, function(value)
 	end
 end)
 
+-- [ TAB #3  -  BLACKHOLE ] --
+
+HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
+	radius = value
+end)
+
+HoleTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value) 
+    angleSpeed = value
+end)
+ 
+HoleTAB:Toggle(" ・ Enable BlackHole", false, function(value)
+    blackHoleActive = value
+    if blackHoleActive then
+        toggleBlackHole()
+    end
+end)
+
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if blackHoleActive then
+            angle = angle + math.rad(angleSpeed)
+        end
+    end
+end)
+
+-- [ TAB #4  -  MOVEMENT ] --
+
+MovementTAB:Slider(" ・ Set WalkSpeed", 5, 200, 16, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+MovementTAB:Slider(" ・ Set JumpPower", 5, 200, 50, function(value)
+	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+end)
+
+MovementTAB:Slider(" ・ Set Gravity", 5, 1000, 196, function(value)
+	game.Workspace.Gravity = value
+end)
+
+-- [ TAB #5  -  MISC ] --
+
+MiscTAB:ColorpickerAlways(" ・ Water Color", Color3.fromRGB(0, 170, 255), function(t)
+	local brickColor = BrickColor.new(t)
+
+    game.Workspace.WaterLevel.BrickColor = brickColor
+	game.Workspace.Structure.FloodLevel.BrickColor = brickColor
+
+	local Children = game.Workspace.TsunamiWave:GetChildren()
+	for _, child in ipairs(Children) do
+        if child:IsA("BasePart") then
+            child.BrickColor = brickColor
+        end
+    end
+end)
+
 MainTAB:Textbox(" ・ Set Player", true, function(value)
     victim = value
 
@@ -325,7 +382,7 @@ MainTAB:Toggle(" ・ Enable Bang", false, function(value)
             anim:Play()
             anim:AdjustSpeed(bangSpeed)
     
-            local bangLoop = game:GetService("RunService").Stepped:Connect(function()
+            bangLoop = game:GetService("RunService").Stepped:Connect(function()
                 wait()
                 local targetRoot = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                 targetRoot.CFrame = targetPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(0, 2.3, -1.1) * CFrame.Angles(0, 3.15, 0)
@@ -334,91 +391,18 @@ MainTAB:Toggle(" ・ Enable Bang", false, function(value)
         else
             ImperiumLib:Notification("Notification", "The player " .. victim .. " was not found.", "Okay!")
         end
+    else
+        if bangLoop then
+            bangLoop:Disconnect()
+            bangLoop = nil
+        end
     end
 end)
 
 MainTAB:Toggle(" ・ Anti Bang", false, function(value)
 end)
 
--- [ TAB #3  -  BLACKHOLE ] --
-
-HoleTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
-	radius = value
-end)
-
-HoleTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value) 
-    angleSpeed = value
-end)
- 
-HoleTAB:Toggle(" ・ Enable BlackHole", false, function(value)
-    blackHoleActive = value
-    if blackHoleActive then
-        toggleBlackHole()
-    end
-end)
-
-spawn(function()
-    while true do
-        RunService.RenderStepped:Wait()
-        if blackHoleActive then
-            angle = angle + math.rad(angleSpeed)
-        end
-    end
-end)
-
--- [ TAB #4  -  MOVEMENT ] --
-
-MovementTAB:Slider(" ・ Set WalkSpeed", 5, 200, 16, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
-end)
-
-MovementTAB:Slider(" ・ Set JumpPower", 5, 200, 50, function(value)
-	game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
-end)
-
-MovementTAB:Slider(" ・ Set Gravity", 5, 1000, 196, function(value)
-	game.Workspace.Gravity = value
-end)
-
--- [ TAB #5  -  MODIFICATIONS ] --
-
-ModifyTAB:ColorpickerAlways(" ・ Water Color", Color3.fromRGB(0, 170, 255), function(t)
-	local brickColor = BrickColor.new(t)
-
-    game.Workspace.WaterLevel.BrickColor = brickColor
-	game.Workspace.Structure.FloodLevel.BrickColor = brickColor
-
-	local Children = game.Workspace.TsunamiWave:GetChildren()
-	for _, child in ipairs(Children) do
-        if child:IsA("BasePart") then
-            child.BrickColor = brickColor
-        end
-    end
-end)
-
-ModifyTAB:Toggle(" ・ Dark Mode", false, function(value)
-	if value == false then
-		game:GetService("Lighting").ClockTime = 14
-		game.Workspace.WaterLevel.BrickColor = BrickColor.new("Bright blue")
-		game.Workspace.Structure.Cloud.BrickColor = BrickColor.new("Sand blue")
-		game.Workspace.Structure.FloodLevel.BrickColor = BrickColor.new("Bright blue")
-		local Children = game.Workspace.TsunamiWave:GetChildren()
-		for a = 1, #Children do
-			Children[a].BrickColor = BrickColor.new("Bright blue")
-		end
-	else
-		game:GetService("Lighting").ClockTime = 4
-		game.Workspace.WaterLevel.BrickColor = BrickColor.new("Black")
-		game.Workspace.Structure.Cloud.BrickColor = BrickColor.new("Black")
-		game.Workspace.Structure.FloodLevel.BrickColor = BrickColor.new("Black")
-		local Children = game.Workspace.TsunamiWave:GetChildren()
-		for a = 1, #Children do
-			Children[a].BrickColor = BrickColor.new("Black")
-		end
-	end
-end)
-
-ModifyTAB:Button(" ・ Remove ADS", function()
+MiscTAB:Button(" ・ Remove ADS", function()
 	game:GetService("Workspace").BillboardAd:Destroy()
     game:GetService("Workspace").ForwardPortal:Destroy()
     game:GetService("Workspace").ReturnPortal:Destroy()
