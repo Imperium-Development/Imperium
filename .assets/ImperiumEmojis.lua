@@ -6,7 +6,7 @@ local MODS = {
     000
 }
 
-local STARS = {
+local PREMIUMS = {
     000
 }
 
@@ -28,13 +28,13 @@ local function updateDisplayName(player)
     if humanoid then
         local plrID = player.UserId
         if table.find(ADMINS, plrID) then
-            humanoid.DisplayName = ('[🦇] ' .. player.DisplayName)
+            humanoid.DisplayName = ('[\240\159\166\135] ' .. player.DisplayName)
         elseif table.find(MODS, plrID) then
-            humanoid.DisplayName = ('[👑] ' .. player.DisplayName)
-        elseif table.find(STARS, plrID) then
-            humanoid.DisplayName = ('[⭐] ' .. player.DisplayName)
+            humanoid.DisplayName = ('[\240\159\145\137] ' .. player.DisplayName)
+        elseif table.find(PREMIUMS, plrID) then
+            humanoid.DisplayName = ('[\226\173\144] ' .. player.DisplayName)
         elseif table.find(playersUsingScript, plrID) then
-            humanoid.DisplayName = ('[😎] ' .. player.DisplayName)
+            humanoid.DisplayName = ('[\240\159\152\142] ' .. player.DisplayName)
         end
     end
 end
