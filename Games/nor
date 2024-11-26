@@ -1,0 +1,109 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/miroeramaa/TurtleLib/main/TurtleUiLib.lua"))()  -- Load the UI library
+local window = library:Window("Black Hole", {width = 400, height = 500})
+
+local blackHole = Instance.new("Part")
+blackHole.Size = Vector3.new(10, 10, 10)
+blackHole.Shape = Enum.PartType.Ball
+blackHole.Anchored = true
+blackHole.CanCollide = false
+blackHole.BrickColor = BrickColor.new("Black")
+blackHole.Position = Vector3.new(0, 10, 0)
+blackHole.Parent = workspace
+
+local radius = 50
+local force = 200
+local transparency = 0.5
+local blackHoleActive = false
+local flightMode = false
+
+local offsetX = 0
+local offsetY = 0
+local offsetZ = 0
+
+local function moveBlackHole()
+    if blackHoleActive then
+        local playerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        if flightMode then
+            offsetY = -6
+        end
+        blackHole.Position = playerPosition + Vector3.new(offsetX, offsetY, offsetZ)
+    end
+end
+
+local function pullObjects()
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("BasePart") and obj ~= blackHole then
+            local distance = (obj.Position - blackHole.Position).magnitude
+            if distance < radius then
+                local direction = (blackHole.Position - obj.Position).unit
+                local pullForce = direction * force / distance
+                if obj:FindFirstChild("BodyVelocity") then
+                    obj.BodyVelocity.Velocity = pullForce
+                else
+                    local bodyVel = Instance.new("BodyVelocity")
+                    bodyVel.MaxForce = Vector3.new(5000, 5000, 5000)
+                    bodyVel.Velocity = pullForce
+                    bodyVel.Parent = obj
+                end
+            end
+        end
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    moveBlackHole()
+    pullObjects()
+end)
+
+window:Toggle("Activate Black Hole", false, function(value)
+    blackHoleActive = value
+    if not blackHoleActive then
+        blackHole.Position = Vector3.new(0, 10, 0)
+    end
+end)
+
+window:Slider("Black Hole Radius", 5, 100, radius, function(value)
+    radius = value
+end)
+
+window:Slider("Attraction Force", 50, 500, force, function(value)
+    force = value
+end)
+
+window:Slider("Offset X", -100, 100, offsetX, function(value)
+    offsetX = value
+end)
+
+window:Slider("Offset Y", -100, 100, offsetY, function(value)
+    offsetY = value
+end)
+
+window:Slider("Offset Z", -100, 100, offsetZ, function(value)
+    offsetZ = value
+end)
+
+window:Textbox("Coordinate X", tostring(offsetX), true, function(value)
+    offsetX = tonumber(value) or 0
+end)
+
+window:Textbox("Coordinate Y", tostring(offsetY), true, function(value)
+    offsetY = tonumber(value) or 0
+end)
+
+window:Textbox("Coordinate Z", tostring(offsetZ), true, function(value)
+    offsetZ = tonumber(value) or 0
+end)
+
+window:Slider("Black Hole Transparency", 0, 1, transparency, function(value)
+    transparency = value
+    blackHole.Transparency = transparency
+end)
+
+window:Button("Flight Mode", function()
+    flightMode = not flightMode
+    if flightMode then
+        offsetY = -6
+    else
+        offsetY = 0
+    end
+end)
