@@ -256,13 +256,13 @@ MainTAB:Button(" ・ Disable Fall Damage", function()
 end)
 
 MainTAB:Slider(" ・ BlackHole Radius", 1, 100, 10, function(value)
-	radius = value
+    radius = value
 end)
 
-MainTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value) 
+MainTAB:Slider(" ・ BlackHole Speed", 1, 100, 2, function(value)
     angleSpeed = value
 end)
- 
+
 MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
     blackHoleActive = value
     if blackHoleActive then
@@ -270,10 +270,19 @@ MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
     end
 end)
 
+MainTAB:Toggle(" ・ Enable Ring BlackHole", false, function(value)
+    ringActive = value
+    if ringActive then
+        toggleRingsBlackHole()
+    else
+        blackHoleActive = false
+    end
+end)
+
 spawn(function()
     while true do
         RunService.RenderStepped:Wait()
-        if blackHoleActive then
+        if blackHoleActive or ringActive then
             angle = angle + math.rad(angleSpeed)
         end
     end
