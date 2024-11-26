@@ -37,16 +37,17 @@ end
 
 -- [ BLACK HOLE FUCTION'S ] ---
 
-local angle = 1
+local angleSingle = 1
+local angleRings = 1
 local radius = 10
 local angleSpeed = 2
 local blackHoleActive = false
 
 local ringActive = false
-local ringCount = 8 -- Rings number
-local ringRadius = 10 -- Rings Distance
+local ringCount = 8 
+local ringRadius = 10 
 local ringAngleOffsets = {}
-
+local Attachments = {}
 
 for i = 1, ringCount do
     table.insert(ringAngleOffsets, (math.pi * 2 / ringCount) * (i - 1))
@@ -58,15 +59,25 @@ local function setupPlayer()
 
     local Folder = Instance.new("Folder", Workspace)
     local Part = Instance.new("Part", Folder)
-    local Attachment1 = Instance.new("Attachment", Part)
+    local AttachmentSingle = Instance.new("Attachment", Part)
     Part.Anchored = true
     Part.CanCollide = false
     Part.Transparency = 1
 
-    return humanoidRootPart, Attachment1
+    local AttachmentList = {}
+    for i = 1, ringCount do
+        local Part = Instance.new("Part", Folder)
+        local Attachment = Instance.new("Attachment", Part)
+        Part.Anchored = true
+        Part.CanCollide = false
+        Part.Transparency = 1
+        table.insert(AttachmentList, Attachment)
+    end
+
+    return humanoidRootPart, AttachmentSingle, AttachmentList
 end
 
-local humanoidRootPart, Attachment1 = setupPlayer()
+local humanoidRootPart, AttachmentSingle, Attachments = setupPlayer()
 
 if not getgenv().Network then
     getgenv().Network = {
@@ -124,11 +135,10 @@ local function ForcePart(v)
         AlignPosition.MaxVelocity = math.huge
         AlignPosition.Responsiveness = 500
         AlignPosition.Attachment0 = Attachment2
-        AlignPosition.Attachment1 = Attachment1
     end
 end
 
-local function toggleBlackHole()
+local function toggleSingleBlackHole()
     if blackHoleActive then
         for _, v in next, Workspace:GetDescendants() do
             ForcePart(v)
@@ -142,16 +152,16 @@ local function toggleBlackHole()
 
         spawn(function()
             while blackHoleActive and RunService.RenderStepped:Wait() do
-                angle = angle + math.rad(angleSpeed)
+                angleSingle = angleSingle + math.rad(angleSpeed)
 
-                local offsetX = math.cos(angle) * radius
-                local offsetZ = math.sin(angle) * radius
+                local offsetX = math.cos(angleSingle) * radius
+                local offsetZ = math.sin(angleSingle) * radius
 
-                Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
+                AttachmentSingle.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, 0, offsetZ)
             end
         end)
     else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
+        AttachmentSingle.WorldCFrame = CFrame.new(0, -1000, 0)
     end
 end
 
@@ -169,27 +179,29 @@ local function toggleRingsBlackHole()
 
         spawn(function()
             while ringActive and RunService.RenderStepped:Wait() do
-                for i = 1, ringCount do
-                    local ringAngle = angle + ringAngleOffsets[i]
+                for i, attachment in ipairs(Attachments) do
+                    local ringAngle = angleRings + ringAngleOffsets[i]
 
                     local offsetX = math.cos(ringAngle) * radius
                     local offsetZ = math.sin(ringAngle) * radius
                     local offsetY = math.sin(math.rad(360 / ringCount) * i) * ringRadius
 
-                    Attachment1.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, offsetY, offsetZ)
+                    attachment.WorldCFrame = humanoidRootPart.CFrame * CFrame.new(offsetX, offsetY, offsetZ)
                 end
-                angle = angle + math.rad(angleSpeed)
+                angleRings = angleRings + math.rad(angleSpeed)
             end
         end)
     else
-        Attachment1.WorldCFrame = CFrame.new(0, -1000, 0)
+        for _, attachment in ipairs(Attachments) do
+            attachment.WorldCFrame = CFrame.new(0, -1000, 0)
+        end
     end
 end
 
 LocalPlayer.CharacterAdded:Connect(function()
-    humanoidRootPart, Attachment1 = setupPlayer()
+    humanoidRootPart, AttachmentSingle, Attachments = setupPlayer()
     if blackHoleActive then
-        toggleBlackHole()
+        toggleSingleBlackHole()
     end
     if ringActive then
         toggleRingsBlackHole()
@@ -266,7 +278,7 @@ end)
 MainTAB:Toggle(" ・ Enable BlackHole", false, function(value)
     blackHoleActive = value
     if blackHoleActive then
-        toggleBlackHole()
+        toggleSingleBlackHole()
     end
 end)
 
@@ -274,16 +286,17 @@ MainTAB:Toggle(" ・ Enable Ring BlackHole", false, function(value)
     ringActive = value
     if ringActive then
         toggleRingsBlackHole()
-    else
-        blackHoleActive = false
     end
 end)
 
 spawn(function()
     while true do
         RunService.RenderStepped:Wait()
-        if blackHoleActive or ringActive then
-            angle = angle + math.rad(angleSpeed)
+        if blackHoleActive then
+            angleSingle = angleSingle + math.rad(angleSpeed)
+        end
+        if ringActive then
+            angleRings = angleRings + math.rad(angleSpeed)
         end
     end
 end)
