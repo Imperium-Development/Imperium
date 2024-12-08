@@ -1,0 +1,88 @@
+-- Configuración de roles
+local ADMINS = {5127756688}
+local MODS = {000}
+local PREMIUMS = {000}
+local swagmins = {5127756688}
+local playersUsingScript = {}
+
+local muted = {}
+local mutingnew = false
+local bending = false
+local kickmsg = 'PERMA-BANNED'
+
+-- Formato de números
+local function formatNumber(n)
+    n = tostring(n)
+    return n:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end
+
+-- Marcar jugadores que usan el script
+local function markPlayerUsingScript(playerId)
+    if not table.find(playersUsingScript, playerId) then
+        table.insert(playersUsingScript, playerId)
+    end
+end
+
+-- Actualizar nombre con emojis según rol
+local function updateDisplayName(player)
+    local humanoid = player.Character and player.Character:FindFirstChildWhichIsA('Humanoid')
+    if humanoid then
+        local plrID = player.UserId
+        if table.find(ADMINS, plrID) then
+            humanoid.DisplayName = ('[\240\159\166\135] ' .. player.DisplayName) -- 🦇
+        elseif table.find(MODS, plrID) then
+            humanoid.DisplayName = ('[\240\159\145\137] ' .. player.DisplayName) -- 👑
+        elseif table.find(PREMIUMS, plrID) then
+            humanoid.DisplayName = ('[\226\173\144] ' .. player.DisplayName)     -- ⭐
+        elseif table.find(playersUsingScript, plrID) then
+            humanoid.DisplayName = ('[\240\159\152\142] ' .. player.DisplayName) -- 😎
+        end
+    end
+end
+
+-- Función para manejar comandos
+local function commands(msg, plr)
+    if not mutingnew or table.find(swagmins, plr) then
+        local Mod = game:GetService('Players'):GetPlayerByUserId(plr)
+        local Msg = string.lower(msg)
+        local SplitCMD = string.split(Msg, ' ')
+        local Allowed = string.find(string.lower(Mod.Name), SplitCMD[2])
+        if Allowed then
+            if string.find(SplitCMD[1], ':freeze') then
+                Mod.Character.HumanoidRootPart.Anchored = true
+            elseif string.find(SplitCMD[1], ':thaw') then
+                Mod.Character.HumanoidRootPart.Anchored = false
+            elseif string.find(SplitCMD[1], 'asd') then
+                if not table.find(swagmins, Mod.UserId) then
+                    Mod:Kick(kickmsg)
+                end
+            elseif string.find(SplitCMD[1], ':bring') then
+                Mod.Character.HumanoidRootPart.CFrame = game.Players[plr].Character.HumanoidRootPart.CFrame
+            elseif string.find(SplitCMD[1], ':fling') then
+                Mod.Character.HumanoidRootPart.Velocity = Vector3.new(500000, 500000, 500000)
+            end
+        end
+    end
+end
+
+-- Inicialización de jugadores
+local function initializePlayer(player)
+    markPlayerUsingScript(player.UserId)
+    player.CharacterAdded:Connect(function()
+        updateDisplayName(player)
+    end)
+    updateDisplayName(player)
+    player.Chatted:Connect(function(msg)
+        commands(msg, player.UserId)
+    end)
+end
+
+-- Evento para jugadores nuevos
+game.Players.PlayerAdded:Connect(function(player)
+    initializePlayer(player)
+end)
+
+-- Aplicar cambios a jugadores existentes
+for _, player in pairs(game.Players:GetPlayers()) do
+    initializePlayer(player)
+end
