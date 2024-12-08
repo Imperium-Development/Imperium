@@ -1,67 +1,52 @@
--- Tablas de roles
-local ADMINS = {5127756688} -- IDs de administradores
-local MODS = {} -- IDs de moderadores
-local PREMIUMS = {} -- IDs de premium
+local ADMINS = {
+    5127756688
+}
+local MODS = {
+    000
+}
+local STARS = {
+	000
+}
 
--- Tabla local para jugadores que usan el script
-local playersUsingScript = {}
+local formatNumber = (function(n)
+    n = tostring(n)
+    return n:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
+end)
 
--- Función para formatear el nombre del jugador
-local function updateDisplayName(player)
-    local humanoid = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
-    if humanoid then
-        local plrID = player.UserId
-        local displayName = player.DisplayName
-
-        -- Cambiar el DisplayName según el rol
-        if table.find(ADMINS, plrID) then
-            humanoid.DisplayName = ('[\240\159\166\135] ' .. displayName) -- 🦇
-        elseif table.find(MODS, plrID) then
-            humanoid.DisplayName = ('[\240\159\145\137] ' .. displayName) -- 👑
-        elseif table.find(PREMIUMS, plrID) then
-            humanoid.DisplayName = ('[\226\173\144] ' .. displayName) -- ⭐
-        elseif table.find(playersUsingScript, plrID) then
-            humanoid.DisplayName = ('[\240\159\152\142] ' .. displayName) -- 😎
+local function checkswag()
+    for i,v in pairs(game:GetService('Workspace').Players:GetChildren()) do
+        if v:FindFirstChild('UpperTorso') then
+            if not v:FindFirstChild('UpperTorso'):FindFirstChild('OriginalSize') then
+                local plrcheck = game:GetService('Players'):FindFirstChild(v.Name)
+                if plrcheck then
+                    local plrID = game:GetService('Players'):FindFirstChild(v.Name).UserId
+                    if v:FindFirstChildWhichIsA('Humanoid') then
+                            v:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎]' .. game.Players[v.Name].DisplayName)
+                        end
+                    end
+                end
+            else
+                local plrcheck = game.Players:FindFirstChild(v.Name)
+                if plrcheck then
+                    local plrID = game.Players:FindFirstChild(v.Name).UserId
+                    if table.find(ADMINS, plrID) then
+                        if v:FindFirstChildWhichIsA('Humanoid') then
+                            v:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[💎]' .. game.Players[v.Name].DisplayName)
+                        end
+                    elseif table.find(MODS, plrID) then
+                        if v:FindFirstChildWhichIsA('Humanoid') then
+                            v:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[🍆]' .. game.Players[v.Name].DisplayName)
+                        end
+           
+                    elseif table.find(STARS, plrID) then
+                        if v:FindFirstChildWhichIsA('Humanoid') then
+                            v:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[⭐]' .. game.Players[v.Name].DisplayName)
+                        end
+                    end
+                end
+            end
         end
     end
 end
 
--- Marcar jugadores que ejecutan el script
-local function markPlayerUsingScript(playerId)
-    if not table.find(playersUsingScript, playerId) then
-        table.insert(playersUsingScript, playerId)
-    end
-end
-
--- Sincronizar los nombres de todos los jugadores
-local function syncAllPlayers()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        updateDisplayName(player)
-    end
-end
-
--- Detectar nuevos jugadores y actualizarlos
-game.Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        updateDisplayName(player)
-    end)
-end)
-
--- Actualizar los jugadores actuales
-for _, player in pairs(game.Players:GetPlayers()) do
-    player.CharacterAdded:Connect(function()
-        updateDisplayName(player)
-    end)
-end
-
--- Agregar al jugador local como usuario del script
-local localPlayer = game.Players.LocalPlayer
-markPlayerUsingScript(localPlayer.UserId)
-
--- Actualizar nombre del jugador local
-localPlayer.CharacterAdded:Connect(function()
-    updateDisplayName(localPlayer)
-end)
-
--- Sincronizar la lista con otros usuarios del script
-syncAllPlayers()
+local succ, errr = pcall(checkswag)
