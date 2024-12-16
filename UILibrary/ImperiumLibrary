@@ -372,17 +372,21 @@ function lib:Window(text, preset, closebind)
             if io.KeyCode == CloseBind then
                 if uitoggled == false then
                     uitoggled = true
-                    OpenHideLabel.Text = "HIDE UI"
+
+                    OpenHideUI.Image = "rbxassetid://71610434705093"
+
                     Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
                         ui.Enabled = false
 			            isGuiOpened = false
                    end)
                 else
                     uitoggled = false
-                    ui.Enabled = true
-                    OpenHideLabel.Text = "HIDE UI"
-		            isGuiOpened = true
+
+                    OpenHideUI.Image = "rbxassetid://71610434705093"
+
                     Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
+                    ui.Enabled = true
+		            isGuiOpened = true
                 end
             end
         end)
@@ -425,18 +429,6 @@ function lib:Window(text, preset, closebind)
   		OpenHideUI.Parent = UIHidder
     	OpenHideUI.BackgroundTransparency = 0.5
     	OpenHideUI.Draggable = true
-
-        -- [ LABEL X BUGS ] --
-
-        local OpenHideLabel = Instance.new("TextLabel")
-        OpenHideLabel.Size = UDim2.new(1, 0, 0.3, 0)
-        OpenHideLabel.Position = UDim2.new(0, 0, 1, 5)
-        OpenHideLabel.BackgroundTransparency = 1
-        OpenHideLabel.Text = "SHOW UI"
-        OpenHideLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        OpenHideLabel.TextScaled = true
-        OpenHideLabel.Font = Enum.Font.SourceSans
-        OpenHideLabel.Parent = OpenHideUI
 
    		UICorner_hide.CornerRadius = UDim.new(.1, 0)
     		UICorner_hide.Parent = OpenHideUI
