@@ -15,7 +15,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local PlayerName = player.Name
+local PlayerName = LocalPlayer.Name
 
 local workspace = game:GetService("Workspace")
 local Stats = game:GetService("Stats")
