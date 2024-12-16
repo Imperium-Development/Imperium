@@ -15,7 +15,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
-local PlayerName = LocalPlayer.Name
+local PlayerName = player.Name
 
 local workspace = game:GetService("Workspace")
 local Stats = game:GetService("Stats")
@@ -372,7 +372,6 @@ function lib:Window(text, preset, closebind)
             if io.KeyCode == CloseBind then
                 if uitoggled == false then
                     uitoggled = true
-                    OpenHideUI.Text = "SHOW UI"
                     Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
                             ui.Enabled = false
 			    isGuiOpened = false
@@ -380,7 +379,6 @@ function lib:Window(text, preset, closebind)
                 else
                     uitoggled = false
                     ui.Enabled = true
-                    OpenHideUI.Text = "HIDE UI"
 		    isGuiOpened = true
                     Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
                 end
@@ -418,13 +416,12 @@ function lib:Window(text, preset, closebind)
 
         -- [ BUTTON ] --
 
-		local OpenHideUI = Instance.new("TextButton")
+		local OpenHideUI = Instance.new("ImageButton")
 		OpenHideUI.Size = UDim2.new(0, 35, 0, 35)
 		OpenHideUI.Position = UDim2.new(0.5, 0, 0, 0)
-  		OpenHideUI.Text = "-"
+  		OpenHideUI.Image = "rbxassetid://71610434705093"
   		OpenHideUI.Parent = UIHidder
     	OpenHideUI.BackgroundTransparency = 0.5
-    	OpenHideUI.TextTransparency = 0
     	OpenHideUI.Draggable = true
 
    		UICorner_hide.CornerRadius = UDim.new(.1, 0)
