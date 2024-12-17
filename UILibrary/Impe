@@ -365,97 +365,64 @@ function lib:Window(text, preset, closebind)
 
     MakeDraggable(DragFrame, Main)
 
-    -- [ TOGGLE UI MOBILE ] --
+    -- [ TOGGLE MOBILE ] --
 
-    local uitoggled = false
-local MobileToggled = false
+    local OpenHideScreen = Instance.new("ScreenGui")
+    OpenHideScreen.Name = "ImperiumToggle"
+    OpenHideScreen.Parent = game.CoreGui
+    OpenHideScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-UserInputService.InputBegan:Connect(function(io, p)
-    if io.KeyCode == CloseBind then
-        if uitoggled == false then
-            uitoggled = true
+    local UIHidder = Instance.new("Frame")
+    UIHidder.Size = UDim2.new(0, 40, 0, 40)
+    UIHidder.Position = UDim2.new(0.5, 0, 0.085, 0)
+    UIHidder.BackgroundTransparency = 1
+    UIHidder.Parent = OpenHideScreen
 
-            OpenHideUI.Image = "rbxassetid://71610434705093"
+    local BlurImage = Instance.new("ImageLabel")
+    BlurImage.Size = UDim2.new(1, 70, 1, 64)
+    BlurImage.Position = UDim2.new(-1, 5, -1, 10)
+    BlurImage.Image = "rbxassetid://8992230677"
+    BlurImage.ImageColor3 = Color3.fromRGB(30, 30, 30)
+    BlurImage.BackgroundTransparency = 1
+    BlurImage.ImageTransparency = 0.5
+    BlurImage.Parent = UIHidder
 
-            Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
-                ui.Enabled = false
-                isGuiOpened = false
+    local OpenHideUI = Instance.new("ImageButton")
+    OpenHideUI.Size = UDim2.new(0, 40, 0, 40)
+    OpenHideUI.Position = UDim2.new(0, 0, 0, 0)
+    OpenHideUI.Image = "rbxassetid://71610434705093"
+    OpenHideUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    OpenHideUI.BackgroundTransparency = 0.1
+    OpenHideUI.AutoButtonColor = false
+    OpenHideUI.ZIndex = 2
+    OpenHideUI.Parent = UIHidder
+
+    local UICorner_hide = Instance.new("UICorner")
+    UICorner_hide.CornerRadius = UDim.new(0.2, 0)
+    UICorner_hide.Parent = OpenHideUI
+
+    local function toggleUI()
+        if isGuiOpened then
+            isGuiOpened = false
+            Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.6, true, function()
+                Main.Visible = false
             end)
         else
-            uitoggled = false
-
-            OpenHideUI.Image = "rbxassetid://71610434705093"
-
-            Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
-            ui.Enabled = true
             isGuiOpened = true
+            Main.Visible = true
+            Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.6, true)
         end
     end
-end)
 
-local function openUI(name, state, input)
-    if state == Enum.UserInputState.Begin then
-        MobileToggled = not MobileToggled
-        if MobileToggled == true then
-            ui.Enabled = true
-            isGuiOpened = true
-            Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
-        elseif MobileToggled == false then
-            Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
-                ui.Enabled = false
-                isGuiOpened = false
-            end)
+    OpenHideUI.MouseButton1Click:Connect(function()
+        toggleUI()
+    end)
+
+    ContextActionService:BindAction("ToggleImperiumUI", function(_, state)
+        if state == Enum.UserInputState.Begin then
+            toggleUI()
         end
-    end
-end
-
--- Botón siempre presente
-local OpenHideScreen = Instance.new("ScreenGui")
-OpenHideScreen.Name = "ImperiumHub"
-OpenHideScreen.Parent = lib.Interface("hide")
-OpenHideScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-local UIHidder = Instance.new("Frame")
-UIHidder.Size = UDim2.new(0.5, 0, 0.1, 0)
-UIHidder.Position = UDim2.new(0.5, 0, 0, 0)
-UIHidder.BackgroundTransparency = 1
-UIHidder.Parent = OpenHideScreen
-
--- [ BOTÓN CON DIFUMINADO ]
-local BlurFrame = Instance.new("Frame")
-BlurFrame.Size = UDim2.new(0, 45, 0, 45) -- Tamaño ligeramente más grande
-BlurFrame.Position = UDim2.new(0.5, -22.5, 0, -5) -- Centrado y ajustado
-BlurFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-BlurFrame.BackgroundTransparency = 0.5
-BlurFrame.Parent = UIHidder
-
-local BlurCorner = Instance.new("UICorner")
-BlurCorner.CornerRadius = UDim.new(0.2, 0)
-BlurCorner.Parent = BlurFrame
-
-local OpenHideUI = Instance.new("ImageButton")
-OpenHideUI.Size = UDim2.new(0, 35, 0, 35)
-OpenHideUI.Position = UDim2.new(0.5, -17.5, 0, 0) -- Centrado
-OpenHideUI.Image = "rbxassetid://71610434705093"
-OpenHideUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Color fijo
-OpenHideUI.Parent = BlurFrame
-OpenHideUI.BackgroundTransparency = 0.1
-OpenHideUI.Draggable = true
-
-local UICorner_hide = Instance.new("UICorner")
-UICorner_hide.CornerRadius = UDim.new(0.2, 0)
-UICorner_hide.Parent = OpenHideUI
-
-OpenHideUI.MouseButton1Click:Connect(function()
-    openUI("", Enum.UserInputState.Begin, Vector3.new(0, 0, 0))
-end)
-
--- Bind también en teclados
-ContextActionService:BindAction("ImperiumHub", openUI, true, Enum.KeyCode.V)
-ContextActionService:SetTitle("ImperiumHub", "MENU")
-ContextActionService:SetDescription("ImperiumHub", "Best script hub in 2024.")
-ContextActionService:SetPosition("ImperiumHub", UDim2.new(0.5, 0, 0, 0))
-
+    end, false, Enum.KeyCode.V)
 
     --[[local uitoggled = false
     local MobileToggled = false
