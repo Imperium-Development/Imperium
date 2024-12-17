@@ -1,16 +1,17 @@
 local ADMINS = {
-    5127756688
+    5127756688 -- ID del Admin
 }
 
 local MODS = {
-    000
+    -- IDs de Mods
 }
 
 local PREMIUMS = {
-    000
+    -- IDs de Premiums
 }
 
-local playersUsingScript = {}
+local localPlayer = game.Players.LocalPlayer
+local playersUsingScript = {} -- Tabla para registrar jugadores usando el script
 
 -- Crear o acceder al espacio compartido en Workspace
 local scriptUsersFolder = workspace:FindFirstChild("ScriptUsersFolder")
@@ -20,98 +21,88 @@ if not scriptUsersFolder then
     scriptUsersFolder.Parent = workspace
 end
 
-local function formatNumber(n)
-    n = tostring(n)
-    return n:reverse():gsub("%d%d%d", "%1,"):reverse():gsub("^,", "")
-end
-
--- Función para registrar al jugador en el espacio compartido
-local function registerPlayerInFolder(player)
-    local userValue = scriptUsersFolder:FindFirstChild(tostring(player.UserId))
-    if not userValue then
+-- Función para registrar al jugador local en el Folder
+local function registerLocalPlayer()
+    if not scriptUsersFolder:FindFirstChild(tostring(localPlayer.UserId)) then
         local newValue = Instance.new("StringValue")
-        newValue.Name = tostring(player.UserId)
-        newValue.Value = player.Name
+        newValue.Name = tostring(localPlayer.UserId)
+        newValue.Value = localPlayer.Name
         newValue.Parent = scriptUsersFolder
     end
 end
 
+-- Función para actualizar el DisplayName respetando rangos
 local function updateDisplayName(player)
     local humanoid = player.Character and player.Character:FindFirstChildWhichIsA('Humanoid')
     if humanoid then
-        local plrID = player.UserId
-        if table.find(ADMINS, plrID) then
-            humanoid.DisplayName = ('[\240\159\166\135] ' .. player.DisplayName) -- 🦇
-        elseif table.find(MODS, plrID) then
-            humanoid.DisplayName = ('[\240\159\145\137] ' .. player.DisplayName) -- 👑
-        elseif table.find(PREMIUMS, plrID) then
-            humanoid.DisplayName = ('[\226\173\144] ' .. player.DisplayName)     -- ⭐
-        elseif table.find(playersUsingScript, plrID) then
-            humanoid.DisplayName = ('[\240\159\152\142] ' .. player.DisplayName) -- 😎
+        local userId = player.UserId
+        if table.find(ADMINS, userId) then
+            humanoid.DisplayName = ('[\240\159\166\135] ' .. player.DisplayName) -- 🦇 Admin
+        elseif table.find(MODS, userId) then
+            humanoid.DisplayName = ('[\240\159\145\137] ' .. player.DisplayName) -- 👑 Mod
+        elseif table.find(PREMIUMS, userId) then
+            humanoid.DisplayName = ('[\226\173\144] ' .. player.DisplayName)     -- ⭐ Premium
+        elseif table.find(playersUsingScript, userId) then
+            humanoid.DisplayName = ('[\240\159\152\142] ' .. player.DisplayName) -- 😎 Script User
         end
     end
 end
 
--- Función para detectar a otros jugadores usando el script
-local function detectOtherScriptUsers()
+-- Función para detectar otros jugadores usando el script
+local function detectScriptUsers()
+    playersUsingScript = {} -- Limpiar la lista
     for _, userValue in pairs(scriptUsersFolder:GetChildren()) do
         local userId = tonumber(userValue.Name)
-        if userId and not table.find(playersUsingScript, userId) then
+        if userId then
             table.insert(playersUsingScript, userId)
-            local plr = game.Players:GetPlayerByUserId(userId)
-            if plr and plr.Character then
-                local humanoid = plr.Character:FindFirstChildWhichIsA("Humanoid")
-                if humanoid then
-                    humanoid.DisplayName = ('[\240\159\152\142] ' .. plr.DisplayName) -- 😎 Emoji
-                end
-            end
         end
     end
 end
 
--- Función al agregar un personaje
-local function onCharacterAdded(player)
-    player.CharacterAdded:Connect(function(character)
-        local humanoid = character:WaitForChild('Humanoid')
-        registerPlayerInFolder(player)
+-- Función para manejar el personaje del jugador local
+local function onLocalCharacterAdded()
+    local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    registerLocalPlayer()
+    detectScriptUsers()
+    updateDisplayName(localPlayer)
+end
+
+-- Actualizar DisplayName de otros jugadores al detectarlos
+local function onOtherPlayerAdded(player)
+    player.CharacterAdded:Connect(function()
+        wait(0.5) -- Esperar a que el personaje cargue
+        detectScriptUsers()
         updateDisplayName(player)
-        detectOtherScriptUsers()
     end)
 end
 
-local function ImperiumEmojis()
+-- Inicializar para el jugador local
+onLocalCharacterAdded()
+localPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
+
+-- Detectar otros jugadores en el servidor
+game.Players.PlayerAdded:Connect(onOtherPlayerAdded)
+
+-- Monitorear cambios en la carpeta de ScriptUsers
+scriptUsersFolder.ChildAdded:Connect(function()
+    detectScriptUsers()
     for _, player in pairs(game.Players:GetPlayers()) do
-        onCharacterAdded(player)
-        registerPlayerInFolder(player)
         updateDisplayName(player)
     end
-end
-
--- Inicializa el script para el jugador local
-local localPlayer = game.Players.LocalPlayer
-registerPlayerInFolder(localPlayer)
-updateDisplayName(localPlayer)
-
-localPlayer.CharacterAdded:Connect(function()
-    updateDisplayName(localPlayer)
-    detectOtherScriptUsers()
 end)
 
--- Detectar otros jugadores usando el script en tiempo real
-scriptUsersFolder.ChildAdded:Connect(detectOtherScriptUsers)
-scriptUsersFolder.ChildRemoved:Connect(detectOtherScriptUsers)
-
-game.Players.PlayerAdded:Connect(function(player)
-    onCharacterAdded(player)
+scriptUsersFolder.ChildRemoved:Connect(function()
+    detectScriptUsers()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        updateDisplayName(player)
+    end
 end)
 
--- Mantener actualizados los nombres periódicamente
+-- Actualizar nombres periódicamente
 while true do
-    detectOtherScriptUsers()
-    wait(2) -- Comprobación cada 2 segundos
-end
-
-local succ, errr = pcall(ImperiumEmojis)
-if not succ then
-    warn("> Imperium  |  Error  •  While executing Name Emojis: " .. errr)
+    detectScriptUsers()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        updateDisplayName(player)
+    end
+    wait(2)
 end
