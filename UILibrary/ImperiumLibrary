@@ -2589,8 +2589,6 @@ local message = [[
 
 
 > Imperium  |  HUB  •  UI Library was executed successfully.  •  Welcome, %s
-
-
 ]]
 
 print(message:format(PlayerName))
