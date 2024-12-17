@@ -35,8 +35,6 @@ ui.Name = "Imperium"
 ui.Parent = game.CoreGui
 ui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-
-
 function lib.randomString()
 	local length = math.random(10,20)
 	local array = {}
@@ -44,67 +42,6 @@ function lib.randomString()
 		array[i] = string.char(math.random(32,126))
 	end
 	return table.concat(array)
-end
-
--- [ TOGGLE UI BUTTON FUNCTION'S ] --
-
-function lib.Interface(str)
-	if str == "hide" then
-		if get_hidden_gui or gethui then
-			local hiddenUI = get_hidden_gui or gethui
-			local Main = Instance.new("ScreenGui")
-			Main.Name = lib.randomString()
-			Main.Parent = hiddenUI()
-			return Main
-		elseif (not is_sirhurt_closure) and (syn and syn.protect_gui) then
-			local Main = Instance.new("ScreenGui")
-			Main.Name = lib.randomString()
-			syn.protect_gui(Main)
-			Main.Parent = game:GetService("CoreGui")
-			return Main
-		elseif game:GetService("CoreGui"):FindFirstChild('RobloxGui') then
-			local Main = Instance.new("ScreenGui")
-			Main.Name = lib.randomString()
-			Main.Parent = game:GetService("CoreGui")["RobloxGui"]
-			return Main
-		else
-			local Main = Instance.new("ScreenGui")
-			Main.Name = lib.randomString()
-			Main.Parent = game:GetService("CoreGui")
-			return Main
-		end
-	elseif str == "log" or str == "get" then
-		if get_hidden_gui then
-			return get_hidden_gui()
-		elseif gethui then
-			return gethui()
-		end
-	end
-end
-
-if lib.Interface("log").Name == "VIP IMPERIUM UI" then
-	lib.Interface("log"):Destroy()
-	ContextActionService:UnbindAction("ImperiumHub")
-end
-
-function lib.clickScreen(area,position)
-    local hitpos = position or {5,5,5}
-    if area == "middle" then
-      if isGuiOpened == false then
-          VirtualInputManager:SendMouseButtonEvent(Camera.ViewportSize.X / 2,Camera.ViewportSize.Y / 2,0,true,game,1)
-          VirtualInputManager:SendMouseButtonEvent(Camera.ViewportSize.X / 2,Camera.ViewportSize.Y / 2,0,false,game,1)
-      end
-    elseif area == "corner" then
-      if isGuiOpened == false then
-          VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,1)
-          VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,1)
-      end
-    elseif area == "custom" then
-      if isGuiOpened == false then
-          VirtualInputManager:SendMouseButtonEvent(hitpos[1],hitpos[2],hitpos[3],true,game,1)
-          VirtualInputManager:SendMouseButtonEvent(hitpos[1],hitpos[2],hitpos[3],false,game,1)
-        end
-    end
 end
 
 -- [ DRAGGABLE FUNCTION'S ] --
@@ -235,7 +172,7 @@ function lib:runtime(funct)
 	if typeof(funct) == "function" then
 		RunService.RenderStepped:Connect(funct)
 	else
-		warn("> Imperium  |  Runtime  •  Argument", "Argument must be a function.", {}, nil, {})
+		print("> Imperium  |  Runtime  •  Argument", "Argument must be a function.", {}, nil, {})
 	end
 end
 
@@ -247,23 +184,10 @@ function lib:FireTouch(gameservice)
 				wait()
 				firetouchinterest(LocalPlayer.Character.HumanoidRootPart,v.Parent,1)
 			else
-				warn("> Imperium  |  FireTouch  •  Your executor doesnt support firetouchinterest()  |  Attempt to index nil function with 'firetouchinterest'")
+				print("> Imperium  |  FireTouch  •  Your executor doesnt support firetouchinterest()  |  Attempt to index nil function with 'firetouchinterest'")
 			end
 		end
 	end)
-end
-
-function lib:Queue_On_Teleport(str)
-    if queue_on_teleport then
-        if type(str) == "string" then
-            warn("> Imperium  |  Auto-Execute  •  This script will automatically execute when you join another game")
-            queue_on_teleport('loadstring(game:HttpGet("' .. str .. '"))()')
-        else
-            warn("> Imperium  |  Error  •  Argument must be a string")
-        end
-    else
-        warn("> Imperium  |  Exploit  •  Missing-function  -  'queue_on_teleport'")
-    end
 end
 
 -- [ CURRENT HOUR ] --
@@ -365,87 +289,64 @@ function lib:Window(text, preset, closebind)
 
     MakeDraggable(DragFrame, Main)
 
-    -- [ TOGGLE UI MOBILE ] --
+    -- [ TOGGLE MOBILE ] --
 
-    local uitoggled = false
-    local MobileToggled = false
-    UserInputService.InputBegan:Connect(function(io, p)
-            if io.KeyCode == CloseBind then
-                if uitoggled == false then
-                    uitoggled = true
+    local OpenHideScreen = Instance.new("ScreenGui")
+    OpenHideScreen.Name = "ImperiumToggle"
+    OpenHideScreen.Parent = game.CoreGui
+    OpenHideScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-                    OpenHideUI.Image = "rbxassetid://71610434705093"
+    local UIHidder = Instance.new("Frame")
+    UIHidder.Size = UDim2.new(0, 40, 0, 40)
+    UIHidder.Position = UDim2.new(0.5, 0, 0.085, 0)
+    UIHidder.BackgroundTransparency = 1
+    UIHidder.Parent = OpenHideScreen
 
-                    Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
-                        ui.Enabled = false
-			            isGuiOpened = false
-                   end)
-                else
-                    uitoggled = false
+    local BlurImage = Instance.new("ImageLabel")
+    BlurImage.Size = UDim2.new(1, 70, 1, 64)
+    BlurImage.Position = UDim2.new(-1, 5, -1, 10)
+    BlurImage.Image = "rbxassetid://8992230677"
+    BlurImage.ImageColor3 = Color3.fromRGB(30, 30, 30)
+    BlurImage.BackgroundTransparency = 1
+    BlurImage.ImageTransparency = 0.5
+    BlurImage.Parent = UIHidder
 
-                    OpenHideUI.Image = "rbxassetid://71610434705093"
+    local OpenHideUI = Instance.new("ImageButton")
+    OpenHideUI.Size = UDim2.new(0, 40, 0, 40)
+    OpenHideUI.Position = UDim2.new(0, 0, 0, 0)
+    OpenHideUI.Image = "rbxassetid://71610434705093"
+    OpenHideUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    OpenHideUI.BackgroundTransparency = 0.1
+    OpenHideUI.AutoButtonColor = false
+    OpenHideUI.ZIndex = 2
+    OpenHideUI.Parent = UIHidder
 
-                    Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
-                    ui.Enabled = true
-		            isGuiOpened = true
-                end
-            end
-        end)
+    local UICorner_hide = Instance.new("UICorner")
+    UICorner_hide.CornerRadius = UDim.new(0.2, 0)
+    UICorner_hide.Parent = OpenHideUI
 
-	local function openUI(name,state,input)
-		if state == Enum.UserInputState.Begin then
-			MobileToggled = not MobileToggled
-			if MobileToggled == true then
-				ui.Enabled = true
-				isGuiOpened = true
-				Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true)
-			elseif MobileToggled == false then
-				Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .6, true, function()
-					ui.Enabled = false
-					isGuiOpened = false
-				end)
-			end
-		end
-	end
+    local function toggleUI()
+        if isGuiOpened then
+            isGuiOpened = false
+            Main:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.6, true, function()
+                Main.Visible = false
+            end)
+        else
+            isGuiOpened = true
+            Main.Visible = true
+            Main:TweenSize(UDim2.new(0, 560, 0, 319), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.6, true)
+        end
+    end
 
-	if table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform()) then
-		local OpenHideScreen = Instance.new("ScreenGui")
-		OpenHideScreen.Name = "ImperiumHub"
-		OpenHideScreen.Parent = lib.Interface("hide")
-		OpenHideScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    OpenHideUI.MouseButton1Click:Connect(function()
+        toggleUI()
+    end)
 
-		local UIHidder = Instance.new("Frame")
-		UIHidder.Size = UDim2.new(0.5, 0, 0.1, 0)
-		UIHidder.Position = UDim2.new(0.5, 0, 0, 0)
-		UIHidder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		UIHidder.Parent = OpenHideScreen
-		UIHidder.BackgroundTransparency = 1
-
-        -- [ BUTTON ] --
-
-		local OpenHideUI = Instance.new("ImageButton")
-		OpenHideUI.Size = UDim2.new(0, 35, 0, 35)
-		OpenHideUI.Position = UDim2.new(0.5, 0, 0, 0)
-  		OpenHideUI.Image = "rbxassetid://71610434705093"
-  		OpenHideUI.Parent = UIHidder
-    	OpenHideUI.BackgroundTransparency = 0.5
-    	OpenHideUI.Draggable = true
-
-   		UICorner_hide.CornerRadius = UDim.new(.1, 0)
-    		UICorner_hide.Parent = OpenHideUI
-    		lib:runtime(function()
-			OpenHideUI.BackgroundColor3 = Color3.fromRGB(math.floor(((math.sin(workspace.DistributedGameTime/2)/2)+0.5)*255), math.floor(((math.sin(workspace.DistributedGameTime)/2)+0.5)*255), math.floor(((math.sin(workspace.DistributedGameTime*1.5)/2)+0.5)*255))
-   		end)
-
-		OpenHideUI.MouseButton1Click:Connect(function()
-			openUI("", Enum.UserInputState.Begin, Vector3.new(0, 0, 0))
-		end)
-	else
-		ContextActionService:BindAction("ImperiumHub", openUI, true, Enum.KeyCode.V)
-		ContextActionService:SetTitle("ImperiumHub", "MENU")
-		ContextActionService:SetDescription("ImperiumHub", "Best script hub in 2024.")
-		ContextActionService:SetPosition("ImperiumHub", UDim2.new(0.5,0,0,0))
-	end
+    ContextActionService:BindAction("ToggleImperiumUI", function(_, state)
+        if state == Enum.UserInputState.Begin then
+            toggleUI()
+        end
+    end, false, Enum.KeyCode.V)
 
     TabFolder.Name = "TabFolder"
     TabFolder.Parent = Main
