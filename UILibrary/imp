@@ -2421,12 +2421,12 @@ function lib:Window(text, preset, closebind)
             LabelTitle.Parent = Label
             LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle.BackgroundTransparency = 1
-            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle.Size = UDim2.new(0, 187, 0, 42)
+            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 11)
+            LabelTitle.Size = UDim2.new(0, 340, 0, 210)
             LabelTitle.Font = Enum.Font.Gotham
             LabelTitle.Text = text
             LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle.TextSize = 14.000
+            LabelTitle.TextSize = 16.000
             LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
 
             if dynamicCallback then
