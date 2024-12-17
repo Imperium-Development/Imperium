@@ -2398,7 +2398,7 @@ function lib:Window(text, preset, closebind)
 
         -- [ MODIFIED LABEL V2 ] --
 
-        function tabcontent:BigLabel(text, dynamicCallback)
+        function tabcontent:ImageLabel(text, dynamicCallback)
             local Label = Instance.new("TextButton")
             local LabelCorner = Instance.new("UICorner")
             local LabelTitle = Instance.new("TextLabel")
@@ -2407,7 +2407,7 @@ function lib:Window(text, preset, closebind)
             Label.Name = "Button"
             Label.Parent = Tab
             Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label.Size = UDim2.new(0, 363, 0, 230)
+            Label.Size = UDim2.new(0, 363, 0, 220)
             Label.AutoButtonColor = false
             Label.Font = Enum.Font.SourceSans
             Label.Text = ""
@@ -2421,13 +2421,82 @@ function lib:Window(text, preset, closebind)
             LabelTitle.Parent = Label
             LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle.BackgroundTransparency = 1
-            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 11)
+            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 6)
             LabelTitle.Size = UDim2.new(0, 340, 0, 210)
             LabelTitle.Font = Enum.Font.Gotham
             LabelTitle.Text = text
             LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle.TextSize = 14.000
             LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+            --
+
+            local ImageButton = Instance.new("TextButton")
+            local ImageCorner = Instance.new("UICorner")
+
+            ImageButton.Name = "Image"
+            ImageButton.Parent = Tab
+            ImageButton.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            ImageButton.Size = UDim2.new(0, 80, 0, 80)
+            ImageButton.AutoButtonColor = false
+            ImageButton.Font = Enum.Font.SourceSans
+            ImageButton.Text = ""
+            ImageButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+            ImageButton.TextSize = 14.000
+        
+            ImageCorner.CornerRadius = UDim.new(0, 5)
+            ImageCorner.Parent = ImageButton
+
+
+            local ImageLabel = Instance.new("ImageLabel")
+            local ImageLabelCorner = Instance.new("UICorner")
+
+            ImageLabel.Name = "ImageLabel"
+            ImageLabel.Parent = ImageButton
+            ImageLabel.BackgroundTransparency = 1
+            ImageLabel.Image = "rbxassetid://71610434705093"
+            ImageLabel.Position = UDim2.new(0, 5, 0, 5)
+            ImageLabel.Size = UDim2.new(0, 70, 0, 70)
+        
+            ImageLabelCorner.CornerRadius = UDim.new(0, 5)
+            ImageLabelCorner.Parent = ImageLabel
+
+
+            local SubLabel = Instance.new("TextButton")
+            local SubCorner = Instance.new("UICorner")
+
+            SubLabel.Name = "Button"
+            SubLabel.Parent = ImageButton
+            SubLabel.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            SubLabel.Position = UDim2.new(0, 85, 0, 0)
+            SubLabel.Size = UDim2.new(0, 278, 0, 80)
+            SubLabel.AutoButtonColor = false
+            SubLabel.Font = Enum.Font.SourceSans
+            SubLabel.Text = ""
+            SubLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            SubLabel.TextSize = 14.000
+        
+            SubCorner.CornerRadius = UDim.new(0, 5)
+            SubCorner.Parent = SubLabel
+
+
+            local SubTextLabel = Instance.new("TextLabel")
+            local SubTextCorner = Instance.new("UICorner")
+
+            SubTextLabel.Name = "TextLabel"
+            SubTextLabel.Parent = SubLabel
+            SubTextLabel.BackgroundTransparency = 1
+            SubTextLabel.Position = UDim2.new(0, 5, 0, 5)
+            SubTextLabel.Size = UDim2.new(0, 267, 0, 70)
+            SubTextLabel.Font = Enum.Font.SourceSans
+            SubTextLabel.Text = "Test"
+            SubTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SubTextLabel.TextSize = 14.000
+        
+            SubTextCorner.CornerRadius = UDim.new(0, 5)
+            SubTextCorner.Parent = SubTextLabel
+
+            --
 
             if dynamicCallback then
                 RunService.RenderStepped:Connect(function()
