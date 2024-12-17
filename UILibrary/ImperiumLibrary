@@ -12,13 +12,16 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local ContextActionService = game:GetService("ContextActionService")
+
 local MarketplaceService = game:GetService("MarketplaceService")
+local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local PlayerName = LocalPlayer.Name
 
 local workspace = game:GetService("Workspace")
 local Stats = game:GetService("Stats")
+local startTime = tick()
 
 local Camera = workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
@@ -274,9 +277,7 @@ local emoji = {
     ["01 01"] = "Imperium  ・  HAPPY NEW YEAR   🎆",
     ["10 31"] = "Imperium  ・  Happy Halloween   🎃",
     ["12 25"] = "Imperium  ・  Merry Christmas   🎄",
-    ["02 14"] = "Imperium  ・  Happy Valentine's Day   💕",
-    ["08 08"] = "Imperium  ・  Fushii GF Birthday   💕",
-    ["06 21"] = "Imperium  ・  Fushii Birthday   🎂"
+    ["02 14"] = "Imperium  ・  Happy Valentine's Day   💕"
 }
 
 function lib:UpdateTitle()
@@ -2345,66 +2346,8 @@ function lib:Window(text, preset, closebind)
 
         -- [ MODIFIED LABEL ] --
 
-        function tabcontent:LabelModify(text, dynamicCallback)
-            local Label = Instance.new("TextButton")
-            local LabelCorner = Instance.new("UICorner")
-            local LabelTitle = Instance.new("TextLabel")
-            local lbl = {}
-        
-            Label.Name = "Button"
-            Label.Parent = Tab
-            Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label.Size = UDim2.new(0, 363, 0, 42)
-            Label.AutoButtonColor = false
-            Label.Font = Enum.Font.SourceSans
-            Label.Text = ""
-            Label.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Label.TextSize = 14.000
-        
-            LabelCorner.CornerRadius = UDim.new(0, 5)
-            LabelCorner.Parent = Label
-        
-            LabelTitle.Name = "ButtonTitle"
-            LabelTitle.Parent = Label
-            LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle.BackgroundTransparency = 1
-            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle.Size = UDim2.new(0, 187, 0, 42)
-            LabelTitle.Font = Enum.Font.Gotham
-            LabelTitle.Text = text
-            LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle.TextSize = 14.000
-            LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-            if dynamicCallback then
-                RunService.RenderStepped:Connect(function()
-                    local newText = dynamicCallback()
-                    if newText and newText ~= LabelTitle.Text then
-                        LabelTitle.Text = newText
-                    end
-                end)
-            end
-
-            function lbl:EditLabel(str)
-                LabelTitle.Text = str
-            end
-        
-            function lbl:GetText()
-                return LabelTitle.Text
-            end
-        
-            return lbl
-        end
-
-        -- [ MODIFIED LABEL V2 ] --
-
         function tabcontent:ImageLabel()
-            local Label = Instance.new("TextButton")
-            local LabelCorner = Instance.new("UICorner")
-            local LabelTitle = Instance.new("TextLabel")
             local lbl = {}
-
-            --
 
             local ImageButton = Instance.new("TextButton")
             local ImageCorner = Instance.new("UICorner")
@@ -2463,20 +2406,25 @@ function lib:Window(text, preset, closebind)
             SubTextLabel.BackgroundTransparency = 1
             SubTextLabel.Position = UDim2.new(0, 5, 0, 5)
             SubTextLabel.Size = UDim2.new(0, 267, 0, 70)
-            SubTextLabel.Font = Enum.Font.SourceSans
-            SubTextLabel.Text = "Test"
+            SubTextLabel.Font = Enum.Font.Gotham
+            SubTextLabel.Text = "  ・  Username: @" .. PlayerName .. "\n\n  ・  Game: " .. GameName
             SubTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             SubTextLabel.TextSize = 14.000
+            SubTextLabel.TextXAlignment = Enum.TextXAlignment.Left
         
             SubTextCorner.CornerRadius = UDim.new(0, 5)
             SubTextCorner.Parent = SubTextLabel
 
             --
         
+            local Label = Instance.new("TextButton")
+            local LabelCorner = Instance.new("UICorner")
+            local LabelTitle = Instance.new("TextLabel")
+
             Label.Name = "Button"
             Label.Parent = Tab
             Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label.Size = UDim2.new(0, 363, 0, 42) -- 0, 363, 0, 220
+            Label.Size = UDim2.new(0, 363, 0, 42)
             Label.AutoButtonColor = false
             Label.Font = Enum.Font.SourceSans
             Label.Text = ""
@@ -2491,7 +2439,7 @@ function lib:Window(text, preset, closebind)
             LabelTitle.Parent = Label
             LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle.BackgroundTransparency = 1.000
-            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 0) -- 0, 340, 0, 210
+            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 0)
             LabelTitle.Size = UDim2.new(0, 187, 0, 42)
             LabelTitle.Font = Enum.Font.Gotham
             LabelTitle.Text = ""
@@ -2507,8 +2455,6 @@ function lib:Window(text, preset, closebind)
                 LabelTitle.Text = string.format("  ・  Game Time: %02d:%02d:%02d", hours, minutes, seconds)
             end)
 
-            --
-        
             local Label2 = Instance.new("TextButton")
             local LabelCorner2 = Instance.new("UICorner")
             local LabelTitle2 = Instance.new("TextLabel")
@@ -2544,8 +2490,6 @@ function lib:Window(text, preset, closebind)
                 LabelTitle2.Text = "  ・  Current Time: " .. currentTime
             end)
 
-            --
-        
             local Label3 = Instance.new("TextButton")
             local LabelCorner3 = Instance.new("UICorner")
             local LabelTitle3 = Instance.new("TextLabel")
