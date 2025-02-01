@@ -1214,9 +1214,6 @@ function lib:Window(text, preset, closebind)
         -- [ ALWAYS OPEN DROPDOWN ] --
 
         function tabcontent:DropdownAlways(text, list, callback)
-            local itemHeight = 30
-            local padding = 5
-        
             local Dropdown = Instance.new("Frame")
             local DropdownCorner = Instance.new("UICorner")
             local DropdownTitle = Instance.new("TextLabel")
@@ -1229,7 +1226,7 @@ function lib:Window(text, preset, closebind)
             Dropdown.Parent = Tab
             Dropdown.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
             Dropdown.Position = UDim2.new(0, 0, 0, 0)
-            Dropdown.Size = UDim2.new(0, 363, 0, 150)
+            Dropdown.Size = UDim2.new(0, 363, 0, 133)
         
             DropdownCorner.CornerRadius = UDim.new(0, 5)
             DropdownCorner.Name = "DropdownCorner"
@@ -1261,14 +1258,14 @@ function lib:Window(text, preset, closebind)
             DropItemHolder.Active = true
             DropItemHolder.BackgroundTransparency = 1
             DropItemHolder.BorderSizePixel = 0
-            DropItemHolder.Position = UDim2.new(0, 0, 0, 40)
-            DropItemHolder.Size = UDim2.new(1, 0, 1, -40)
-            DropItemHolder.CanvasSize = UDim2.new(0, 0, 0, #list * (itemHeight + padding))
+            DropItemHolder.Position = UDim2.new(0, 13, 0, 40)
+            DropItemHolder.Size = UDim2.new(0, 342, 0, 78)
+            DropItemHolder.CanvasSize = UDim2.new(0, 0, 0, 0)
             DropItemHolder.ScrollBarThickness = 3
         
+            DropLayout.Name = "DropLayout"
             DropLayout.Parent = DropItemHolder
             DropLayout.SortOrder = Enum.SortOrder.LayoutOrder
-            DropLayout.Padding = UDim.new(0, padding)
         
             Padding.Parent = DropItemHolder
             Padding.PaddingTop = UDim.new(0, 5)
@@ -1280,7 +1277,7 @@ function lib:Window(text, preset, closebind)
                 Item.Name = v
                 Item.Parent = DropItemHolder
                 Item.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-                Item.Size = UDim2.new(1, -10, 0, itemHeight)
+                Item.Size = UDim2.new(0, 335, 0, 25)
                 Item.AutoButtonColor = false
                 Item.Font = Enum.Font.Gotham
                 Item.Text = v
