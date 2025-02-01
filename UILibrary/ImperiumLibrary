@@ -1243,7 +1243,7 @@ function lib:Window(text, preset, closebind)
             DropdownTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
             DropdownTitle.TextSize = 14.000
             DropdownTitle.TextXAlignment = Enum.TextXAlignment.Left
-
+        
             ArrowImg.Name = "ArrowImg"
             ArrowImg.Parent = DropdownTitle
             ArrowImg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1270,47 +1270,76 @@ function lib:Window(text, preset, closebind)
             Padding.Parent = DropItemHolder
             Padding.PaddingTop = UDim.new(0, 5)
         
-            for _, v in ipairs(list) do
-                local Item = Instance.new("TextButton")
-                local ItemCorner = Instance.new("UICorner")
+            local function updateItems()
+                for _, child in pairs(DropItemHolder:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        child:Destroy()
+                    end
+                end
         
-                Item.Name = v
-                Item.Parent = DropItemHolder
-                Item.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-                Item.Size = UDim2.new(0, 335, 0, 25)
-                Item.AutoButtonColor = false
-                Item.Font = Enum.Font.Gotham
-                Item.Text = v
-                Item.TextColor3 = Color3.fromRGB(255, 255, 255)
-                Item.TextSize = 15
+                for _, v in ipairs(list) do
+                    local Item = Instance.new("TextButton")
+                    local ItemCorner = Instance.new("UICorner")
         
-                ItemCorner.CornerRadius = UDim.new(0, 4)
-                ItemCorner.Parent = Item
+                    Item.Name = v
+                    Item.Parent = DropItemHolder
+                    Item.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+                    Item.Size = UDim2.new(0, 335, 0, 25)
+                    Item.AutoButtonColor = false
+                    Item.Font = Enum.Font.Gotham
+                    Item.Text = v
+                    Item.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    Item.TextSize = 15
         
-                Item.MouseEnter:Connect(function()
-                    TweenService:Create(
-                        Item,
-                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                        {BackgroundColor3 = Color3.fromRGB(37, 37, 37)}
-                    ):Play()
-                end)
+                    ItemCorner.CornerRadius = UDim.new(0, 4)
+                    ItemCorner.Parent = Item
         
-                Item.MouseLeave:Connect(function()
-                    TweenService:Create(
-                        Item,
-                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                        {BackgroundColor3 = Color3.fromRGB(34, 34, 34)}
-                    ):Play()
-                end)
+                    Item.MouseEnter:Connect(function()
+                        TweenService:Create(
+                            Item,
+                            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                            {BackgroundColor3 = Color3.fromRGB(37, 37, 37)}
+                        ):Play()
+                    end)
         
-                Item.MouseButton1Click:Connect(function()
-                    DropdownTitle.Text = text .. "  -  " .. v
-                    pcall(callback, v)
-                end)
+                    Item.MouseLeave:Connect(function()
+                        TweenService:Create(
+                            Item,
+                            TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                            {BackgroundColor3 = Color3.fromRGB(34, 34, 34)}
+                        ):Play()
+                    end)
+        
+                    Item.MouseButton1Click:Connect(function()
+                        DropdownTitle.Text = text .. "  -  " .. v
+                        pcall(callback, v)
+                    end)
+                end
+        
+                DropItemHolder.CanvasSize = UDim2.new(0, 0, 0, DropLayout.AbsoluteContentSize.Y)
             end
         
-            DropItemHolder.CanvasSize = UDim2.new(0, 0, 0, DropLayout.AbsoluteContentSize.Y)
-        end
+            updateItems()
+        
+            game.Players.PlayerAdded:Connect(function()
+                list = {} 
+                for _, player in ipairs(game.Players:GetPlayers()) do
+                    table.insert(list, player.Name)
+                end
+                updateItems()
+            end)
+        
+            game.Players.PlayerRemoving:Connect(function(player)
+                for i, name in ipairs(list) do
+                    if name == player.Name then
+                        table.remove(list, i)
+                        break
+                    end
+                end
+                updateItems()
+            end)
+            return updateItems
+        end      
 
         function tabcontent:Colorpicker(text, preset, callback)
             local ColorPickerToggled = false
