@@ -1210,10 +1210,8 @@ function lib:Window(text, preset, closebind)
             end
             Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
         end
-
-        -- [ ALWAYS OPEN DROPDOWN ] --
-
-        function tabcontent:DropdownAlways(text, list, callback)
+        
+        function tabcontent:DropdownAlways(text, list, callback, isPlayerList)
             local Dropdown = Instance.new("Frame")
             local DropdownCorner = Instance.new("UICorner")
             local DropdownTitle = Instance.new("TextLabel")
@@ -1229,14 +1227,11 @@ function lib:Window(text, preset, closebind)
             Dropdown.Size = UDim2.new(0, 363, 0, 133)
         
             DropdownCorner.CornerRadius = UDim.new(0, 5)
-            DropdownCorner.Name = "DropdownCorner"
             DropdownCorner.Parent = Dropdown
         
-            DropdownTitle.Name = "DropdownTitle"
             DropdownTitle.Parent = Dropdown
-            DropdownTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             DropdownTitle.BackgroundTransparency = 1.000
-            DropdownTitle.Position = UDim2.new(0.0358126722, 0, 0, 0)
+            DropdownTitle.Position = UDim2.new(0.035, 0, 0, 0)
             DropdownTitle.Size = UDim2.new(0, 187, 0, 42)
             DropdownTitle.Font = Enum.Font.Gotham
             DropdownTitle.Text = text
@@ -1244,16 +1239,13 @@ function lib:Window(text, preset, closebind)
             DropdownTitle.TextSize = 14.000
             DropdownTitle.TextXAlignment = Enum.TextXAlignment.Left
         
-            ArrowImg.Name = "ArrowImg"
             ArrowImg.Parent = DropdownTitle
-            ArrowImg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             ArrowImg.BackgroundTransparency = 1.000
-            ArrowImg.Position = UDim2.new(1.65240645, 0, 0.190476194, 0)
+            ArrowImg.Position = UDim2.new(1.65, 0, 0.19, 0)
             ArrowImg.Size = UDim2.new(0, 26, 0, 26)
             ArrowImg.Image = "http://www.roblox.com/asset/?id=6034818375"
             ArrowImg.Rotation = -90
         
-            DropItemHolder.Name = "DropItemHolder"
             DropItemHolder.Parent = Dropdown
             DropItemHolder.Active = true
             DropItemHolder.BackgroundTransparency = 1
@@ -1263,7 +1255,6 @@ function lib:Window(text, preset, closebind)
             DropItemHolder.CanvasSize = UDim2.new(0, 0, 0, 0)
             DropItemHolder.ScrollBarThickness = 3
         
-            DropLayout.Name = "DropLayout"
             DropLayout.Parent = DropItemHolder
             DropLayout.SortOrder = Enum.SortOrder.LayoutOrder
         
@@ -1321,25 +1312,28 @@ function lib:Window(text, preset, closebind)
         
             updateItems()
         
-            game.Players.PlayerAdded:Connect(function()
-                list = {} 
-                for _, player in ipairs(game.Players:GetPlayers()) do
-                    table.insert(list, player.Name)
-                end
-                updateItems()
-            end)
-        
-            game.Players.PlayerRemoving:Connect(function(player)
-                for i, name in ipairs(list) do
-                    if name == player.Name then
-                        table.remove(list, i)
-                        break
+            if isPlayerList then
+                game.Players.PlayerAdded:Connect(function()
+                    list = {}
+                    for _, player in ipairs(game.Players:GetPlayers()) do
+                        table.insert(list, player.Name)
                     end
-                end
-                updateItems()
-            end)
+                    updateItems()
+                end)
+        
+                game.Players.PlayerRemoving:Connect(function(player)
+                    for i, name in ipairs(list) do
+                        if name == player.Name then
+                            table.remove(list, i)
+                            break
+                        end
+                    end
+                    updateItems()
+                end)
+            end
+        
             return updateItems
-        end      
+        end
 
         function tabcontent:Colorpicker(text, preset, callback)
             local ColorPickerToggled = false
