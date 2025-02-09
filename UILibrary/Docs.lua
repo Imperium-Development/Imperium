@@ -1,10 +1,9 @@
 --[[
 
-Coding: utf-8
-Copyright (C) 2024 github.com/donfushii
+Copyright (C) 2025 github.com/donfushii
+Powered By Imperium ♡
 
 --]]
-
 
 -- [ UI LIBRARY] --
 local lib = loadstring(game:HttpGet"https://raw.githubusercontent.com/Imperium-Development/Imperium/main/UILibrary/ImperiumLibrary")()
@@ -35,7 +34,7 @@ end)
 
 tab:DropdownAlways("Dropdown",{"Option 1","Option 2","Option 3","Option 4","Option 5"}, function(t)
 print("Imperium On Top.")
-end, true/false) -- True = Dropdown auto Updater.  |  False = Dropdown normal but opened.
+end, true/false) -- True = Dropdown always opened with auto Updater.  |  False = Dropdown always opened without auto Updater.
 
 -- [ TAB CONTENT  |  COLORPICKER ] --
 tab:Colorpicker("UI Color",Color3.fromRGB(44, 120, 224), function(t)
