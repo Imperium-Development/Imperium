@@ -17,7 +17,7 @@
   <a href="#-what-is-imperium">WHAT IS</a> •
 	<a href="#-script">SCRIPT</a> •
 	<a href="#-premium-not-added-for-now">PREMIUM</a> •
-	<a href="https://discord.gg/fVepfmCy">Discord server</a>
+	<a href="https://discord.gg/fVepfmCy">DISCORD</a>
 </p>
 <br/>
 
