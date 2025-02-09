@@ -29,7 +29,7 @@
 ⠀         ⠀                           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀         ⠀                                       ⠀⠀⠈⠛⠶⡤⣀⠶⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
                                     ⠀         ⠀                                                       ¿NO OPEN SOUCE?
-⠀         ⠀                            ⠀         ⠀                                       JOIN IMPERIUM   -   discord.gg/uG94hejN⠀⠀⠀
+⠀         ⠀                            ⠀         ⠀                                       JOIN IMPERIUM   -   discord.gg/fVepfmCy⠀⠀⠀
 
 
 
