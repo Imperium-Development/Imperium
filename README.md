@@ -5,7 +5,7 @@
 -->
 
 <p align="center">
-	<a href="https://discord.gg/uG94hejN"><img src=".assets/icon.ico" alt="Imperium" height="90" /></a>
+	<a href="https://discord.gg/fVepfmCy"><img src=".assets/icon.ico" alt="Imperium" height="90" /></a>
 </p>
 
 <h4 align="center">IMPERIUM | SCRIPT HUB</h4>
@@ -17,7 +17,7 @@
   <a href="#-what-is-imperium">WHAT IS</a> •
 	<a href="#-script">SCRIPT</a> •
 	<a href="#-premium-not-added-for-now">PREMIUM</a> •
-	<a href="https://discord.gg/uG94hejN">Discord server</a>
+	<a href="https://discord.gg/fVepfmCy">Discord server</a>
 </p>
 <br/>
 
@@ -44,7 +44,7 @@
         ██║██║╚██╔╝██║██╔═══╝ ██╔══╝  ██╔══██╗██║██║   ██║██║╚██╔╝██║      ██╔══██║██║   ██║██╔══██╗
         ██║██║ ╚═╝ ██║██║     ███████╗██║  ██║██║╚██████╔╝██║ ╚═╝ ██║      ██║  ██║╚██████╔╝██████╦╝
         ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝ ╚═════╝ ╚═╝     ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
-                                                                                discord.gg/uG94hejN
+                                                                                discord.gg/fVepfmCy
 
 ]]--
 
@@ -57,7 +57,7 @@
 
 <br>
 
-## • PREMIUM (NOT ADDED FOR NOW)
+## • PREMIUM
 
 **_1. What's is the use?_**
 > Alert: With this you can use those commands on players that executed our script in your lobby/game.<br>
@@ -67,7 +67,7 @@ Example: !bring [USERNAME] or "."
 > (+) Adds a emoji to your name. [⭐]<br>
 > (+) Makes you immune to other premium users.
 
-**_3. Premium commands_**
+**_3. Premium preview commands_**
 > !bring&nbsp;&nbsp;|  Teleport's a Imperium User to you.<br>
 > !kill&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  Kill's a Imperium User.<br>
 > !fling&nbsp;&nbsp;&nbsp; |  Make flung a Imperium User.<br>
