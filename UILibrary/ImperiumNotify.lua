@@ -17,7 +17,7 @@ NotifyUI.Parent = game.CoreGui
 NotifyUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 function lib:Notification(texttitle, textdesc, textbtn, callback)
-    local NotificationHold = Instance.new("TextButton")
+    local NotificationHold = Instance.new("Frame")
     local NotificationFrame = Instance.new("Frame")
     local OkayBtn = Instance.new("TextButton")
     local OkayBtnCorner = Instance.new("UICorner")
@@ -32,11 +32,6 @@ function lib:Notification(texttitle, textdesc, textbtn, callback)
     NotificationHold.BorderSizePixel = 0
     NotificationHold.Size = UDim2.new(1, 0, 1, 0)
     NotificationHold.Position = UDim2.new(0, 0, 0, 0)
-    NotificationHold.AutoButtonColor = false
-    NotificationHold.Font = Enum.Font.SourceSans
-    NotificationHold.Text = ""
-    NotificationHold.TextColor3 = Color3.fromRGB(0, 0, 0)
-    NotificationHold.TextSize = 14.000
 
     TweenService:Create(
         NotificationHold,
@@ -55,7 +50,7 @@ function lib:Notification(texttitle, textdesc, textbtn, callback)
     NotificationFrame.ClipsDescendants = true
 
     NotificationFrame:TweenSize(
-        UDim2.new(0, 194, 0, 213),
+        UDim2.new(0, 210, 0, 260),
         Enum.EasingDirection.Out,
         Enum.EasingStyle.Quart,
         .6,
@@ -65,8 +60,8 @@ function lib:Notification(texttitle, textdesc, textbtn, callback)
     OkayBtn.Name = "OkayBtn"
     OkayBtn.Parent = NotificationFrame
     OkayBtn.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-    OkayBtn.Position = UDim2.new(0.0609756112, 0, 0.720207274, 0)
-    OkayBtn.Size = UDim2.new(0, 170, 0, 42)
+    OkayBtn.Position = UDim2.new(0.0609756112, 0, 0.720207274, 15)
+    OkayBtn.Size = UDim2.new(0, 184, 0, 42)
     OkayBtn.AutoButtonColor = false
     OkayBtn.Font = Enum.Font.SourceSans
     OkayBtn.Text = ""
@@ -106,7 +101,7 @@ function lib:Notification(texttitle, textdesc, textbtn, callback)
     NotificationDesc.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     NotificationDesc.BackgroundTransparency = 1.000
     NotificationDesc.Position = UDim2.new(0.0670000017, 0, 0.218999997, 0)
-    NotificationDesc.Size = UDim2.new(0, 170, 0, 91)
+    NotificationDesc.Size = UDim2.new(0, 184, 0, 140)
     NotificationDesc.Font = Enum.Font.Gotham
     NotificationDesc.Text = textdesc
     NotificationDesc.TextColor3 = Color3.fromRGB(255, 255, 255)
