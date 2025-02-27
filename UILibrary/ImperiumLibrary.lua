@@ -1,7 +1,7 @@
 --[[
 
-Copyright (C) 2025 github.com/donfushii
-Powered By Imperium ♡
+Coding: utf-8
+Copyright (C) 2024 github.com/donfushii
 
 --]]
 
@@ -298,7 +298,7 @@ function lib:Window(text, preset, closebind)
 
     local UIHidder = Instance.new("Frame")
     UIHidder.Size = UDim2.new(0, 40, 0, 40)
-    UIHidder.Position = UDim2.new(0.5, 0, 0.085, 0)
+    UIHidder.Position = UDim2.new(0.5, -20, 0.085, 0)
     UIHidder.BackgroundTransparency = 1
     UIHidder.Parent = OpenHideScreen
 
@@ -670,10 +670,12 @@ function lib:Window(text, preset, closebind)
                 end
             )
 
+            task.wait(0.1)
             Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
         end
 
-        function tabcontent:Toggle(text,default, callback)
+
+        function tabcontent:Toggle(text, default, callback)
             local toggled = false
 
             local Toggle = Instance.new("TextButton")
@@ -870,7 +872,8 @@ function lib:Window(text, preset, closebind)
             end
 
             Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
-        end
+        end 
+
 
         function tabcontent:Slider(text, min, max, start, callback)
             local dragging = false
