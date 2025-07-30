@@ -298,7 +298,7 @@ function lib:Window(text, preset, closebind)
 
     local UIHidder = Instance.new("Frame")
     UIHidder.Size = UDim2.new(0, 40, 0, 40)
-    UIHidder.Position = UDim2.new(0.5, -20, 0.085, 0)
+    UIHidder.Position = UDim2.new(0.5, -20, 0.085, -50)
     UIHidder.BackgroundTransparency = 1
     UIHidder.Parent = OpenHideScreen
 
@@ -2334,6 +2334,7 @@ function lib:Window(text, preset, closebind)
             SubTextLabel.Position = UDim2.new(0, 5, 0, 5)
             SubTextLabel.Size = UDim2.new(0, 267, 0, 70)
             SubTextLabel.Font = Enum.Font.Gotham
+	    SubTextLabel.TextTruncate = Enum.TextTruncate.AtEnd
             SubTextLabel.Text = "  ・  Username: @" .. PlayerName .. "\n\n  ・  Game: " .. GameName
             SubTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             SubTextLabel.TextSize = 14.000
