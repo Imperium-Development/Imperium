@@ -1,7 +1,7 @@
 --[[
 
-Coding: utf-8
-Copyright (C) 2024 github.com/donfushii
+Copyright (C) 2025 github.com/donfushii
+Powered By Imperium ♡
 
 --]]
 
