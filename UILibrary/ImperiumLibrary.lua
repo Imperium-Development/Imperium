@@ -7,6 +7,7 @@ Powered By Imperium ♡
 
 local lib = {RainbowColorValue = 0, HueSelectionPosition = 0}
 
+local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -117,55 +118,6 @@ local function MakeDraggable(topbarobject, object)
             end
         end
     )
-end
-
-function lib:children(path,f,t)
-	local index = t or false
-	if typeof(path) == "Instance" then
-		for i,v in pairs(path:GetChildren()) do 
-			if index == true then
-				f(i,v)
-			else
-				f(v)
-			end
-		end
-	elseif typeof(path) == "table" then
-		for i,v in pairs(path) do 
-			if index == true then
-				f(i,v)
-			else
-				f(v)
-			end
-		end
-	end
-end
-
-function lib:descendant(path, f, t)
-	local index = t or false
-	for i,v in pairs(path:GetDescendants()) do
-		if index == true then
-			f(i, v)
-		else
-			f(v)
-		end
-	end
-end
-
-function lib.scanner(v,path)
-	local instance = path or workspace
-	if v == true then
-		lib:descendant(instance,function(i) 
-			if i:IsA("BasePart") or i:IsA("Part") and not i.Parent:FindFirstChildOfClass('Humanoid') and not i.Parent.Parent:FindFirstChildOfClass('Humanoid') then
-				i.LocalTransparencyModifier = 1
-			end
-		end)
-	else
-		lib:descendant(instance,function(i) 
-			if i:IsA("BasePart") or i:IsA("Part") and not i.Parent:FindFirstChildOfClass('Humanoid') and not i.Parent.Parent:FindFirstChildOfClass('Humanoid') then
-				i.LocalTransparencyModifier = 0
-			end
-		end)
-	end
 end
 
 function lib:runtime(funct)
@@ -298,7 +250,7 @@ function lib:Window(text, preset, closebind)
 
     local UIHidder = Instance.new("Frame")
     UIHidder.Size = UDim2.new(0, 40, 0, 40)
-    UIHidder.Position = UDim2.new(0.5, -20, 0.085, -50)
+    UIHidder.Position = UDim2.new(0.5, -20, 0.085, 0)
     UIHidder.BackgroundTransparency = 1
     UIHidder.Parent = OpenHideScreen
 
@@ -2273,86 +2225,16 @@ function lib:Window(text, preset, closebind)
 
         -- [ MODIFIED LABEL ] --
 
-        function tabcontent:ImageLabel()
+        function tabcontent:ImageDiscord(callback)
             local lbl = {}
 
-            local ImageButton = Instance.new("TextButton")
-            local ImageCorner = Instance.new("UICorner")
-
-            ImageButton.Name = "Image"
-            ImageButton.Parent = Tab
-            ImageButton.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            ImageButton.Size = UDim2.new(0, 80, 0, 80)
-            ImageButton.AutoButtonColor = false
-            ImageButton.Font = Enum.Font.SourceSans
-            ImageButton.Text = ""
-            ImageButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-            ImageButton.TextSize = 14.000
-        
-            ImageCorner.CornerRadius = UDim.new(0, 5)
-            ImageCorner.Parent = ImageButton
-
-
-            local ImageLabel = Instance.new("ImageLabel")
-            local ImageLabelCorner = Instance.new("UICorner")
-
-            ImageLabel.Name = "ImageLabel"
-            ImageLabel.Parent = ImageButton
-            ImageLabel.BackgroundTransparency = 1
-            ImageLabel.Image = "rbxassetid://71610434705093"
-            ImageLabel.Position = UDim2.new(0, 5, 0, 5)
-            ImageLabel.Size = UDim2.new(0, 70, 0, 70)
-        
-            ImageLabelCorner.CornerRadius = UDim.new(0, 5)
-            ImageLabelCorner.Parent = ImageLabel
-
-
-            local SubLabel = Instance.new("TextButton")
-            local SubCorner = Instance.new("UICorner")
-
-            SubLabel.Name = "Button"
-            SubLabel.Parent = ImageButton
-            SubLabel.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            SubLabel.Position = UDim2.new(0, 85, 0, 0)
-            SubLabel.Size = UDim2.new(0, 278, 0, 80)
-            SubLabel.AutoButtonColor = false
-            SubLabel.Font = Enum.Font.SourceSans
-            SubLabel.Text = ""
-            SubLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-            SubLabel.TextSize = 14.000
-        
-            SubCorner.CornerRadius = UDim.new(0, 5)
-            SubCorner.Parent = SubLabel
-
-
-            local SubTextLabel = Instance.new("TextLabel")
-            local SubTextCorner = Instance.new("UICorner")
-
-            SubTextLabel.Name = "TextLabel"
-            SubTextLabel.Parent = SubLabel
-            SubTextLabel.BackgroundTransparency = 1
-            SubTextLabel.Position = UDim2.new(0, 5, 0, 5)
-            SubTextLabel.Size = UDim2.new(0, 267, 0, 70)
-            SubTextLabel.Font = Enum.Font.Gotham
-	    SubTextLabel.TextTruncate = Enum.TextTruncate.AtEnd
-            SubTextLabel.Text = "  ・  Username: @" .. PlayerName .. "\n\n  ・  Game: " .. GameName
-            SubTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            SubTextLabel.TextSize = 14.000
-            SubTextLabel.TextXAlignment = Enum.TextXAlignment.Left
-        
-            SubTextCorner.CornerRadius = UDim.new(0, 5)
-            SubTextCorner.Parent = SubTextLabel
-
-            --
-        
             local Label = Instance.new("TextButton")
             local LabelCorner = Instance.new("UICorner")
-            local LabelTitle = Instance.new("TextLabel")
 
-            Label.Name = "Button"
+            Label.Name = "BackgroundButton"
             Label.Parent = Tab
             Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label.Size = UDim2.new(0, 363, 0, 42)
+            Label.Size = UDim2.new(0, 363, 0, 145)
             Label.AutoButtonColor = false
             Label.Font = Enum.Font.SourceSans
             Label.Text = ""
@@ -2363,25 +2245,189 @@ function lib:Window(text, preset, closebind)
             LabelCorner.Name = "ButtonCorner"
             LabelCorner.Parent = Label
 
-            LabelTitle.Name = "ButtonTitle"
-            LabelTitle.Parent = Label
-            LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle.BackgroundTransparency = 1.000
-            LabelTitle.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle.Size = UDim2.new(0, 187, 0, 42)
-            LabelTitle.Font = Enum.Font.Gotham
-            LabelTitle.Text = ""
-            LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle.TextSize = 14.000
-            LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
+            local ImageLabel = Instance.new("ImageLabel")
+            local ImageLabelCorner = Instance.new("UICorner")
 
-            game:GetService("RunService").RenderStepped:Connect(function()
-                local elapsedTime = math.floor(tick() - startTime)
-                local hours = math.floor(elapsedTime / 3600)
-                local minutes = math.floor((elapsedTime % 3600) / 60)
-                local seconds = elapsedTime % 60
-                LabelTitle.Text = string.format("  ・  Game Time: %02d:%02d:%02d", hours, minutes, seconds)
+            ImageLabel.Name = "ImageLabel"
+            ImageLabel.Parent = Label
+            ImageLabel.BackgroundTransparency = 1
+            ImageLabel.Image = "rbxassetid://71610434705093"
+            ImageLabel.Position = UDim2.new(0, 5, 0, 17)
+            ImageLabel.Size = UDim2.new(0, 70, 0, 70)
+        
+            ImageLabelCorner.CornerRadius = UDim.new(0, 5)
+            ImageLabelCorner.Parent = ImageLabel
+
+            local SublabelTitle1 = Instance.new("TextLabel")
+            local SublabelTitle2 = Instance.new("TextLabel")
+            local SublabelTitle3 = Instance.new("TextLabel")
+
+            local OnlineCircle = Instance.new("TextLabel")
+            local OfflineCircle = Instance.new("TextLabel")
+            local OnlineCircleCorner = Instance.new("UICorner")
+            local OfflineCircleCorner = Instance.new("UICorner")
+
+            local JoinSubButton = Instance.new("TextButton")
+            local JoinSubButtonCorner = Instance.new("UICorner")
+
+            SublabelTitle1.Name = "LabelServer"
+            SublabelTitle1.Parent = Label
+            SublabelTitle1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle1.BackgroundTransparency = 1.000
+            SublabelTitle1.Position = UDim2.new(0.2, 10, 0, 15)
+            SublabelTitle1.Size = UDim2.new(0, 270, 0, 42)
+            SublabelTitle1.Font = Enum.Font.Gotham
+            SublabelTitle1.Text = "IMPERIUM  🦇"
+            SublabelTitle1.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle1.TextSize = 14.000
+            SublabelTitle1.TextXAlignment = Enum.TextXAlignment.Left
+            SublabelTitle1.TextTruncate = Enum.TextTruncate.AtEnd
+
+            SublabelTitle2.Name = "LabelOnline"
+            SublabelTitle2.Parent = Label
+            SublabelTitle2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle2.BackgroundTransparency = 1.000
+            SublabelTitle2.Position = UDim2.new(0.2, 30, 0, 45)
+            SublabelTitle2.Size = UDim2.new(0, 155, 0, 42)
+            SublabelTitle2.Font = Enum.Font.Gotham
+            SublabelTitle2.Text = "0 Online"
+            SublabelTitle2.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle2.TextSize = 14.000
+            SublabelTitle2.TextXAlignment = Enum.TextXAlignment.Left
+            SublabelTitle2.TextTruncate = Enum.TextTruncate.AtEnd
+
+            SublabelTitle3.Name = "LabelMembers"
+            SublabelTitle3.Parent = Label
+            SublabelTitle3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle3.BackgroundTransparency = 1.000
+            SublabelTitle3.Position = UDim2.new(0.2, 170, 0, 45)
+            SublabelTitle3.Size = UDim2.new(0, 155, 0, 42)
+            SublabelTitle3.Font = Enum.Font.Gotham
+            SublabelTitle3.Text = "0 Members"
+            SublabelTitle3.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SublabelTitle3.TextSize = 14.000
+            SublabelTitle3.TextXAlignment = Enum.TextXAlignment.Left
+            SublabelTitle3.TextTruncate = Enum.TextTruncate.AtEnd
+
+            OnlineCircle.Name = "OnlineLabel"
+            OnlineCircle.Parent = Label
+            OnlineCircle.BackgroundColor3 = Color3.fromRGB(119, 207, 116)
+            OnlineCircle.BackgroundTransparency = 0
+            OnlineCircle.Position = UDim2.new(0, 85, 0, 61)
+            OnlineCircle.Size = UDim2.new(0, 10, 0, 10)
+            OnlineCircle.Text = ""
+            OnlineCircle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            OnlineCircle.TextSize = 14.000
+
+            OnlineCircleCorner.CornerRadius = UDim.new(100, 0)
+            OnlineCircleCorner.Name = "ButtonCorner"
+            OnlineCircleCorner.Parent = OnlineCircle
+
+            OfflineCircle.Name = "OfflineLabel"
+            OfflineCircle.Parent = Label
+            OfflineCircle.BackgroundColor3 = Color3.fromRGB(163, 162, 165)
+            OfflineCircle.BackgroundTransparency = 0
+            OfflineCircle.Position = UDim2.new(0, 225, 0, 61)
+            OfflineCircle.Size = UDim2.new(0, 10, 0, 10)
+            OfflineCircle.Text = ""
+            OfflineCircle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            OfflineCircle.TextSize = 14.000
+
+            OfflineCircleCorner.CornerRadius = UDim.new(100, 0)
+            OfflineCircleCorner.Name = "ButtonCorner"
+            OfflineCircleCorner.Parent = OfflineCircle
+
+            JoinSubButton.Name = "JoinButton"
+            JoinSubButton.Parent = Label
+            JoinSubButton.BackgroundColor3 = Color3.fromRGB(119, 207, 116)
+            JoinSubButton.Position = UDim2.new(0, 7, 0, 95)
+            JoinSubButton.Size = UDim2.new(0, 350, 0, 42)
+            JoinSubButton.AutoButtonColor = false
+            JoinSubButton.Font = Enum.Font.Gotham
+            JoinSubButton.Text = "Join"
+            JoinSubButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            JoinSubButton.TextSize = 14.000
+
+            JoinSubButtonCorner.CornerRadius = UDim.new(0, 5)
+            JoinSubButtonCorner.Name = "ButtonCorner"
+            JoinSubButtonCorner.Parent = JoinSubButton
+
+            if typeof(callback) == "function" then
+	        	JoinSubButton.MouseButton1Click:Connect(callback)
+	        end
+
+            local url = "https://imperium-kkqh.onrender.com/status"
+
+			local function requestDiscordStatus()
+                if http_request then
+                    return http_request({Url = url, Method = "GET"})
+                else
+                    print("> Imperium  |  HTTP Request  •  Your executor doesnt support HTTP Requests  |  Attempt to index nil function with 'HTTP'")
+                    return nil
+                end
+            end
+
+            local function updateDiscordStatus()
+                local success, result = pcall(function()
+                    local response = requestDiscordStatus()
+                    if not response or response.StatusCode ~= 200 then
+                        print("> Imperium  |  ERROR  •  Website error  |  Request failed or bad status code")
+                    end
+                    return response.Body
+                end)
+
+                if success then
+                    local data = HttpService:JSONDecode(result)
+
+                    SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
+                    SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
+                    SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
+                else
+                    SublabelTitle1.Text = "IMPERIUM  🦇"
+                    SublabelTitle2.Text = "0 Online"
+                    SublabelTitle3.Text = "0 Members"
+                end
+            end
+
+            updateDiscordStatus()
+
+            task.spawn(function()
+                while true do
+                    updateDiscordStatus()
+                    task.wait(10)
+                end
             end)
+
+            local Label1 = Instance.new("TextButton")
+            local LabelCorner1 = Instance.new("UICorner")
+            local LabelTitle1 = Instance.new("TextLabel")
+
+            Label1.Name = "Button"
+            Label1.Parent = Tab
+            Label1.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            Label1.Size = UDim2.new(0, 363, 0, 42)
+            Label1.AutoButtonColor = false
+            Label1.Font = Enum.Font.SourceSans
+            Label1.Text = ""
+            Label1.TextColor3 = Color3.fromRGB(0, 0, 0)
+            Label1.TextSize = 14.000
+
+            LabelCorner1.CornerRadius = UDim.new(0, 5)
+            LabelCorner1.Name = "ButtonCorner"
+            LabelCorner1.Parent = Label1
+
+            LabelTitle1.Name = "ButtonTitle"
+            LabelTitle1.Parent = Label1
+            LabelTitle1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            LabelTitle1.BackgroundTransparency = 1.000
+            LabelTitle1.Position = UDim2.new(0.0358126722, 0, 0, 0)
+            LabelTitle1.Size = UDim2.new(0, 187, 0, 42)
+            LabelTitle1.Font = Enum.Font.Gotham
+            LabelTitle1.Text = "  ・  Game:   " .. GameName
+            LabelTitle1.TextColor3 = Color3.fromRGB(255, 255, 255)
+            LabelTitle1.TextSize = 14.000
+            LabelTitle1.TextXAlignment = Enum.TextXAlignment.Left
+            LabelTitle1.TextTruncate = Enum.TextTruncate.AtEnd
 
             local Label2 = Instance.new("TextButton")
             local LabelCorner2 = Instance.new("UICorner")
@@ -2415,42 +2461,8 @@ function lib:Window(text, preset, closebind)
 
             game:GetService("RunService").RenderStepped:Connect(function()
                 local currentTime = DateTime.now():FormatLocalTime("h:mm:ss A", "en-us")
-                LabelTitle2.Text = "  ・  Current Time: " .. currentTime
-            end)
-
-            local Label3 = Instance.new("TextButton")
-            local LabelCorner3 = Instance.new("UICorner")
-            local LabelTitle3 = Instance.new("TextLabel")
-
-            Label3.Name = "Button"
-            Label3.Parent = Tab
-            Label3.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label3.Size = UDim2.new(0, 363, 0, 42)
-            Label3.AutoButtonColor = false
-            Label3.Font = Enum.Font.SourceSans
-            Label3.Text = ""
-            Label3.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Label3.TextSize = 14.000
-
-            LabelCorner3.CornerRadius = UDim.new(0, 5)
-            LabelCorner3.Name = "ButtonCorner"
-            LabelCorner3.Parent = Label3
-
-            LabelTitle3.Name = "ButtonTitle"
-            LabelTitle3.Parent = Label3
-            LabelTitle3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle3.BackgroundTransparency = 1.000
-            LabelTitle3.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle3.Size = UDim2.new(0, 187, 0, 42)
-            LabelTitle3.Font = Enum.Font.Gotham
-            LabelTitle3.Text = ""
-            LabelTitle3.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle3.TextSize = 14.000
-            LabelTitle3.TextXAlignment = Enum.TextXAlignment.Left
-
-            game:GetService("RunService").RenderStepped:Connect(function()
                 local playerCount = #game:GetService("Players"):GetPlayers() or #game:GetService("Players"):GetChildren()
-                LabelTitle3.Text = "  ・  Current Players: " .. playerCount
+                LabelTitle2.Text = "  ・  Current Players:   " .. playerCount .. "        -        " .. currentTime
             end)
         
             return lbl
