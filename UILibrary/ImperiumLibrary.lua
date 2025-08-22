@@ -2421,7 +2421,7 @@ function lib:Window(text, preset, closebind)
             LabelTitle1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle1.BackgroundTransparency = 1.000
             LabelTitle1.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle1.Size = UDim2.new(0, 187, 0, 42)
+            LabelTitle1.Size = UDim2.new(0, 340, 0, 42)
             LabelTitle1.Font = Enum.Font.Gotham
             LabelTitle1.Text = "  ・  Game:   " .. GameName
             LabelTitle1.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -2452,7 +2452,7 @@ function lib:Window(text, preset, closebind)
             LabelTitle2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelTitle2.BackgroundTransparency = 1.000
             LabelTitle2.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle2.Size = UDim2.new(0, 187, 0, 42)
+            LabelTitle2.Size = UDim2.new(0, 340, 0, 42)
             LabelTitle2.Font = Enum.Font.Gotham
             LabelTitle2.Text = ""
             LabelTitle2.TextColor3 = Color3.fromRGB(255, 255, 255)
