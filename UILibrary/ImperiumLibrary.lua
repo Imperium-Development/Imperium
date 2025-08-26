@@ -5,7 +5,7 @@ Powered By Imperium ♡
 
 --]]
 
-local lib = {RainbowColorValue = 0, HueSelectionPosition = 0}
+local lib = { RainbowColorValue = 0, HueSelectionPosition = 0 }
 
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
@@ -825,6 +825,181 @@ function lib:Window(text, preset, closebind)
 
             Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
         end 
+
+
+        function tabcontent:ToggleBind(text, default, keypreset, callback, externalCallback)
+            local UIS = game:GetService("UserInputService")
+
+            local toggled = false
+            local binding = false
+            local Key = (keypreset and keypreset.Name) or "..."
+
+            local Row = Instance.new("Frame")
+            Row.Name = "ToggleBind"
+            Row.Parent = Tab
+            Row.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            Row.Size = UDim2.new(0, 363, 0, 42)
+        
+            local RowCorner = Instance.new("UICorner")
+            RowCorner.CornerRadius = UDim.new(0, 5)
+            RowCorner.Parent = Row
+        
+            local ToggleBtn = Instance.new("TextButton")
+            ToggleBtn.Name = "ToggleBtn"
+            ToggleBtn.Parent = Row
+            ToggleBtn.BackgroundTransparency = 1
+            ToggleBtn.Size = UDim2.new(1, 0, 1, 0)
+            ToggleBtn.AutoButtonColor = false
+            ToggleBtn.Text = ""
+        
+            local Title = Instance.new("TextLabel")
+            Title.Name = "Title"
+            Title.Parent = Row
+            Title.BackgroundTransparency = 1
+            Title.Position = UDim2.new(0.0358, 0, 0, 0)
+            Title.Size = UDim2.new(0, 187, 0, 42)
+            Title.Font = Enum.Font.Gotham
+            Title.Text = text
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.TextSize = 14
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+        
+            local BindButton = Instance.new("TextButton")
+            BindButton.Name = "BindButton"
+            BindButton.Parent = Row
+            BindButton.BackgroundTransparency = 1
+            BindButton.AutoButtonColor = false
+            BindButton.Position = UDim2.new(0.60, 0, 0, 0)
+            BindButton.Size = UDim2.new(0, 80, 0, 42)
+            BindButton.ZIndex = 2
+            BindButton.Text = ""
+        
+            local BindText = Instance.new("TextLabel")
+            BindText.Name = "BindText"
+            BindText.Parent = BindButton
+            BindText.BackgroundTransparency = 1
+            BindText.Size = UDim2.new(1, 0, 1, 0)
+            BindText.Font = Enum.Font.Gotham
+            BindText.Text = Key
+            BindText.TextColor3 = Color3.fromRGB(200, 200, 200)
+            BindText.TextSize = 14
+            BindText.TextXAlignment = Enum.TextXAlignment.Right
+        
+            local FrameToggle1 = Instance.new("Frame")
+            FrameToggle1.Name = "FrameToggle1"
+            FrameToggle1.Parent = Row
+            FrameToggle1.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            FrameToggle1.Position = UDim2.new(0.87, 0, 0.285, 0)
+            FrameToggle1.Size = UDim2.new(0, 37, 0, 18)
+        
+            local FrameToggle1Corner = Instance.new("UICorner")
+            FrameToggle1Corner.Parent = FrameToggle1
+        
+            local FrameToggle2 = Instance.new("Frame")
+            FrameToggle2.Name = "FrameToggle2"
+            FrameToggle2.Parent = FrameToggle1
+            FrameToggle2.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            FrameToggle2.Position = UDim2.new(0.049, 0, 0.093, 0)
+            FrameToggle2.Size = UDim2.new(0, 33, 0, 14)
+        
+            local FrameToggle2Corner = Instance.new("UICorner")
+            FrameToggle2Corner.Parent = FrameToggle2
+        
+            local FrameToggle3 = Instance.new("Frame")
+            FrameToggle3.Name = "FrameToggle3"
+            FrameToggle3.Parent = FrameToggle1
+            FrameToggle3.BackgroundColor3 = PresetColor
+            FrameToggle3.BackgroundTransparency = 1
+            FrameToggle3.Size = UDim2.new(0, 37, 0, 18)
+        
+            local FrameToggle3Corner = Instance.new("UICorner")
+            FrameToggle3Corner.Parent = FrameToggle3
+        
+            local FrameToggleCircle = Instance.new("Frame")
+            FrameToggleCircle.Name = "FrameToggleCircle"
+            FrameToggleCircle.Parent = FrameToggle1
+            FrameToggleCircle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            FrameToggleCircle.Position = UDim2.new(0.127, 0, 0.222, 0)
+            FrameToggleCircle.Size = UDim2.new(0, 10, 0, 10)
+        
+            local FrameToggleCircleCorner = Instance.new("UICorner")
+            FrameToggleCircleCorner.Parent = FrameToggleCircle
+        
+            coroutine.wrap(function()
+                while task.wait() do
+                    FrameToggle3.BackgroundColor3 = PresetColor
+                end
+            end)()
+        
+            local function Set(state)
+                if toggled == state then return end
+                toggled = state
+        
+                if state then
+                    TweenService:Create(Row, TweenInfo.new(.3), {BackgroundColor3 = Color3.fromRGB(37, 37, 37)}):Play()
+                    TweenService:Create(FrameToggle1, TweenInfo.new(.3), {BackgroundTransparency = 1}):Play()
+                    TweenService:Create(FrameToggle2, TweenInfo.new(.3), {BackgroundTransparency = 1}):Play()
+                    TweenService:Create(FrameToggle3, TweenInfo.new(.3), {BackgroundTransparency = 0}):Play()
+                    TweenService:Create(FrameToggleCircle, TweenInfo.new(.3), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                    FrameToggleCircle:TweenPosition(UDim2.new(0.587, 0, 0.222, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .2, true)
+                else
+                    TweenService:Create(Row, TweenInfo.new(.3), {BackgroundColor3 = Color3.fromRGB(34, 34, 34)}):Play()
+                    TweenService:Create(FrameToggle1, TweenInfo.new(.3), {BackgroundTransparency = 0}):Play()
+                    TweenService:Create(FrameToggle2, TweenInfo.new(.3), {BackgroundTransparency = 0}):Play()
+                    TweenService:Create(FrameToggle3, TweenInfo.new(.3), {BackgroundTransparency = 1}):Play()
+                    TweenService:Create(FrameToggleCircle, TweenInfo.new(.3), {BackgroundColor3 = Color3.fromRGB(50, 50, 50)}):Play()
+                    FrameToggleCircle:TweenPosition(UDim2.new(0.127, 0, 0.222, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .2, true)
+                end
+        
+                pcall(callback, toggled)
+
+                if externalCallback then
+                    pcall(externalCallback, toggled)
+                end
+            end
+        
+            ToggleBtn.MouseButton1Click:Connect(function()
+                if not binding then
+                    Set(not toggled)
+                end
+            end)
+        
+            BindButton.MouseButton1Click:Connect(function()
+                BindText.Text = "..."
+                binding = true
+                local input = UIS.InputBegan:Wait()
+                if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode.Name ~= "Unknown" then
+                    Key = input.KeyCode.Name
+                    BindText.Text = Key
+                else
+                    BindText.Text = Key
+                end
+                task.wait(0.05)
+                binding = false
+            end)
+        
+            UIS.InputBegan:Connect(function(io, gp)
+            if gp or binding then return end
+                if io.UserInputType == Enum.UserInputType.Keyboard and io.KeyCode.Name == Key then
+                    Set(not toggled)
+                end
+            end)
+        
+            if default then
+                Set(true)
+            end
+        
+            Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
+        
+            return {
+                Set = Set,
+                Get = function() return toggled end,
+                SetKey = function(kc)
+                    Key = kc.Name
+                    BindText.Text = Key
+                end
+            }
+        end
 
 
         function tabcontent:Slider(text, min, max, start, callback)
