@@ -2561,14 +2561,14 @@ function lib:Window(text, preset, closebind)
                         SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
                         SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
                     else
-                        SublabelTitle1.Text = "IMPERIUM  🦇"
-                        SublabelTitle2.Text = "0 Online"
-                        SublabelTitle3.Text = "0 Members"
+                        SublabelTitle1.Text = "[Server Offline]  IMPERIUM  🦇"
+                        SublabelTitle2.Text = "? ... Online"
+                        SublabelTitle3.Text = "? ... Members"
                     end
                 else
-                    SublabelTitle1.Text = "IMPERIUM  🦇"
-                    SublabelTitle2.Text = "0 Online"
-                    SublabelTitle3.Text = "0 Members"
+                    SublabelTitle1.Text = "[Server Offline]  IMPERIUM  🦇"
+                    SublabelTitle2.Text = "? ... Online"
+                    SublabelTitle3.Text = "? ... Members"
                 end
             end
 
