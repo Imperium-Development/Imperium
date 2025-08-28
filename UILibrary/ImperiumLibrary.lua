@@ -2546,17 +2546,25 @@ function lib:Window(text, preset, closebind)
                 local success, result = pcall(function()
                     local response = requestDiscordStatus()
                     if not response or response.StatusCode ~= 200 then
-                        print("> Imperium  |  ERROR  •  Website error  |  Request failed or bad status code")
+                        return nil
                     end
                     return response.Body
                 end)
 
-                if success then
-                    local data = HttpService:JSONDecode(result)
+                if success and result then
+                    local ok, data = pcall(function()
+                        return HttpService:JSONDecode(result)
+                    end)
 
-                    SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
-                    SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
-                    SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
+                    if ok and data then
+                        SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
+                        SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
+                        SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
+                    else
+                        SublabelTitle1.Text = "IMPERIUM  🦇"
+                        SublabelTitle2.Text = "0 Online"
+                        SublabelTitle3.Text = "0 Members"
+                    end
                 else
                     SublabelTitle1.Text = "IMPERIUM  🦇"
                     SublabelTitle2.Text = "0 Online"
