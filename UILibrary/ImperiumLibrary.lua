@@ -184,6 +184,7 @@ end
 
 local assets = {
     logo = { file = folderPath .. "/imperiumicon.png", url = baseURL .. "imperiumicon.png" },
+    script_owner = { file = folderPath .. "/scriptowner.png", url = baseURL .. "scriptowner.png" },
     player = { file = folderPath .. "/user.png", url = baseURL .. "user.png" },
     fps = { file = folderPath .. "/fps.png", url = baseURL .. "fps.png" },
     ping_low = { file = folderPath .. "/signal-low.png", url = baseURL .. "signal-low.png" },
@@ -211,6 +212,7 @@ local function loadAsset(path)
 end
 
 local logoAsset = loadAsset(assets.logo.file)
+local scriptOwner = loadAsset(assets.script_owner.file)
 local playerIcon = loadAsset(assets.player.file)
 local fpsIcon = loadAsset(assets.fps.file)
 local pingLowIcon = loadAsset(assets.ping_low.file)
@@ -286,13 +288,6 @@ function lib:Window(text, preset, closebind)
     MakeDraggable(DragFrame, Main)
 
     -- [ DYNAMIC ISLAND ] --
-
-    local logoAsset = loadAsset(assets.logo.file)
-    local playerIcon = loadAsset(assets.player.file)
-    local fpsIcon = loadAsset(assets.fps.file)
-    local pingLowIcon = loadAsset(assets.ping_low.file)
-    local pingMedIcon = loadAsset(assets.ping_med.file)
-    local pingHighIcon = loadAsset(assets.ping_high.file)
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "ImperiumDynamicIsland"
@@ -2546,7 +2541,7 @@ function lib:Window(text, preset, closebind)
             LabelIcon.BackgroundTransparency = 1
             LabelIcon.Position = UDim2.new(0, 10, 0, 8)
             LabelIcon.Size = UDim2.new(0, 50, 0, 50)
-            LabelIcon.Image = getcustomasset("scriptowner.png")
+            LabelIcon.Image = scriptOwner
 
             LabelIconCorner.CornerRadius = UDim.new(0, 5)
             LabelIconCorner.Name = "ButtonCorner"
