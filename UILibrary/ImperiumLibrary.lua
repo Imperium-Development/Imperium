@@ -291,31 +291,29 @@ function lib:Window(text, preset, closebind)
 
     -- [ DYNAMIC ISLAND ] --
 
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ImperiumDynamic"
-    ScreenGui.Parent = game:GetService("CoreGui")
+    local CoreGui = game:GetService("CoreGui")
+    local TopBar = CoreGui:WaitForChild("TopBarApp", 5)
+    local App = TopBar:WaitForChild("TopBarApp", 5)
+    local UnibarLeft = App:WaitForChild("UnibarLeftFrame", 5)
+    local StackedElements = UnibarLeft:WaitForChild("StackedElements", 5)
+
+    local padding = StackedElements:FindFirstChildOfClass("UIPadding") or Instance.new("UIPadding")
+    padding.PaddingLeft = UDim.new(0, 15)
+    padding.Parent = StackedElements
 
     local Frame = Instance.new("Frame")
     Frame.Name = "MainFrame"
-    Frame.Parent = ScreenGui
+    Frame.Parent = StackedElements
     Frame.AnchorPoint = Vector2.new(0.5, 0)
-    Frame.Position = UDim2.new(0.5, 0, 0, 10)
-    Frame.Size = UDim2.new(0, 340, 0, 36)
-    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    Frame.BackgroundTransparency = 0.1
+    Frame.Position = UDim2.new(0, 0, 0, 0)
+    Frame.Size = UDim2.new(0, 340, 1, 0)
+    Frame.BackgroundColor3 = Color3.fromRGB(18, 18, 21)
+    Frame.BackgroundTransparency = 0.08
     Frame.BorderSizePixel = 0
 
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = UDim.new(1, 0)
     UICorner.Parent = Frame
-
-    local UIStroke = Instance.new("UIStroke")
-    UIStroke.Thickness = 1
-    UIStroke.Transparency = 0.3
-    UIStroke.Color = Color3.fromRGB(80, 80, 85)
-    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-    UIStroke.LineJoinMode = Enum.LineJoinMode.Round
-    UIStroke.Parent = Frame
 
     local Logo = Instance.new("ImageButton")
     Logo.Name = "LogoButton"
@@ -346,7 +344,7 @@ function lib:Window(text, preset, closebind)
         icon.Parent = frame
         icon.BackgroundTransparency = 1
         icon.Size = UDim2.new(0, 14, 0, 14)
-        icon.Position = UDim2.new(0, 0, 0.3, 0)
+        icon.Position = UDim2.new(0, 0, 0, 15)
         icon.Image = iconImage
 
         local text = Instance.new("TextLabel")
@@ -2580,7 +2578,7 @@ function lib:Window(text, preset, closebind)
 
         -- [ MODIFIED LABEL ] --
 
-        function tabcontent:ImageDiscord(callback)
+        function tabcontent:ImageDiscord(changelogText, callback)
             local lbl = {}
 
             local Label = Instance.new("TextButton")
@@ -2589,7 +2587,7 @@ function lib:Window(text, preset, closebind)
             Label.Name = "BackgroundButton"
             Label.Parent = Tab
             Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label.Size = UDim2.new(0, 363, 0, 145)
+            Label.Size = UDim2.new(0, 363, 0, 135)
             Label.AutoButtonColor = false
             Label.Font = Enum.Font.SourceSans
             Label.Text = ""
@@ -2599,6 +2597,52 @@ function lib:Window(text, preset, closebind)
             LabelCorner.CornerRadius = UDim.new(0, 5)
             LabelCorner.Name = "ButtonCorner"
             LabelCorner.Parent = Label
+            
+            local LabelChangelogs = Instance.new("TextButton")
+            local LabelChangelogsCorner = Instance.new("UICorner")
+
+            LabelChangelogs.Name = "ChangeLogsButton"
+            LabelChangelogs.Parent = Tab
+            LabelChangelogs.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            LabelChangelogs.Size = UDim2.new(0, 363, 0, 100)
+            LabelChangelogs.AutoButtonColor = false
+            LabelChangelogs.Font = Enum.Font.SourceSans
+            LabelChangelogs.Text = ""
+            LabelChangelogs.TextColor3 = Color3.fromRGB(0, 0, 0)
+            LabelChangelogs.TextSize = 14.000
+
+            LabelChangelogsCorner.CornerRadius = UDim.new(0, 5)
+            LabelChangelogsCorner.Name = "ButtonCorner"
+            LabelChangelogsCorner.Parent = LabelChangelogs
+
+            local LogsTitleLabel = Instance.new("TextLabel")
+            local ChangelogsLabel = Instance.new("TextLabel")
+
+            LogsTitleLabel.Name = "LogsTitleLabel"
+            LogsTitleLabel.Parent = LabelChangelogs
+            LogsTitleLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            LogsTitleLabel.BackgroundTransparency = 1.000
+            LogsTitleLabel.Position = UDim2.new(0, 10, 0, 5)
+            LogsTitleLabel.Size = UDim2.new(0, 155, 0, 20)
+            LogsTitleLabel.Font = Enum.Font.Gotham
+            LogsTitleLabel.Text = "Changelogs"
+            LogsTitleLabel.TextColor3 = Color3.fromRGB(141, 141, 141)
+            LogsTitleLabel.TextSize = 10.000
+            LogsTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+            LogsTitleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+
+            ChangelogsLabel.Name = "ChangelogsLabel"
+            ChangelogsLabel.Parent = LabelChangelogs
+            ChangelogsLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            ChangelogsLabel.BackgroundTransparency = 1.000
+            ChangelogsLabel.Position = UDim2.new(0, 9, 0, 30)
+            ChangelogsLabel.Size = UDim2.new(1, -15, 0, 60)
+            ChangelogsLabel.Font = Enum.Font.Gotham
+            ChangelogsLabel.Text = changelogText or "  ・  No recent updates."
+            ChangelogsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ChangelogsLabel.TextSize = 14.000
+            ChangelogsLabel.TextXAlignment = Enum.TextXAlignment.Left
+            ChangelogsLabel.TextTruncate = Enum.TextTruncate.AtEnd
 
             local ImageLabel = Instance.new("ImageLabel")
             local ImageLabelCorner = Instance.new("UICorner")
@@ -2696,7 +2740,7 @@ function lib:Window(text, preset, closebind)
             JoinSubButton.Parent = Label
             JoinSubButton.BackgroundColor3 = Color3.fromRGB(119, 207, 116)
             JoinSubButton.Position = UDim2.new(0, 7, 0, 95)
-            JoinSubButton.Size = UDim2.new(0, 350, 0, 42)
+            JoinSubButton.Size = UDim2.new(0, 350, 0, 33)
             JoinSubButton.AutoButtonColor = false
             JoinSubButton.Font = Enum.Font.Gotham
             JoinSubButton.Text = "Join"
@@ -2710,6 +2754,10 @@ function lib:Window(text, preset, closebind)
             if typeof(callback) == "function" then
 	        	JoinSubButton.MouseButton1Click:Connect(callback)
 	        end
+
+            if typeof(changelogText) == "function" then
+      		    LabelChangelogs.MouseButton1Click:Connect(changelogText)
+   			end
 
             local url = "https://imperium-kkqh.onrender.com/status"
 
