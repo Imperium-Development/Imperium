@@ -173,6 +173,51 @@ function lib:SetTitle(titleText)
     end
 end
 
+-- [ DYNAMIC ISLAND ] --
+
+local folderPath = "Imperium_Assets"
+local baseURL = "https://raw.githubusercontent.com/Imperium-Development/Imperium/main/.assets/"
+
+if not isfolder(folderPath) then
+    makefolder(folderPath)
+end
+
+local assets = {
+    logo = { file = folderPath .. "/imperiumicon.png", url = baseURL .. "imperiumicon.png" },
+    player = { file = folderPath .. "/user.png", url = baseURL .. "user.png" },
+    fps = { file = folderPath .. "/fps.png", url = baseURL .. "fps.png" },
+    ping_low = { file = folderPath .. "/signal-low.png", url = baseURL .. "signal-low.png" },
+    ping_med = { file = folderPath .. "/signal-medium.png", url = baseURL .. "signal-medium.png" },
+    ping_high = { file = folderPath .. "/signal-high.png", url = baseURL .. "signal-high.png" }
+}
+
+for _, v in pairs(assets) do
+    if not isfile(v.file) then
+        local success, response = pcall(function()
+            return game:HttpGet(v.url)
+        end)
+        if success and response then
+            writefile(v.file, response)
+        end
+    end
+end
+
+local function loadAsset(path)
+    if isfile(path) then
+        return getcustomasset(path)
+    else
+        return "rbxassetid://0"
+    end
+end
+
+local logoAsset = loadAsset(assets.logo.file)
+local playerIcon = loadAsset(assets.player.file)
+local fpsIcon = loadAsset(assets.fps.file)
+local pingLowIcon = loadAsset(assets.ping_low.file)
+local pingMedIcon = loadAsset(assets.ping_med.file)
+local pingHighIcon = loadAsset(assets.ping_high.file)
+
+
 function lib:Window(text, preset, closebind)
     CloseBind = closebind or Enum.KeyCode.RightControl
     PresetColor = preset or Color3.fromRGB(44, 120, 224)
@@ -241,42 +286,6 @@ function lib:Window(text, preset, closebind)
     MakeDraggable(DragFrame, Main)
 
     -- [ DYNAMIC ISLAND ] --
-
-    local folderPath = "Imperium_Assets"
-
-    if not isfolder("Imperium_Assets") then
-        makefolder("Imperium_Assets")
-    end
-
-    local baseURL = "https://raw.githubusercontent.com/Imperium-Development/Imperium/main/.assets/"
-
-    local assets = {
-        logo = { file = folderPath .. "/imperiumicon.png", url = baseURL .. "imperiumicon.png" },
-        player = { file = folderPath .. "/user.png", url = baseURL .. "user.png" },
-        fps = { file = folderPath .. "/fps.png", url = baseURL .. "fps.png" },
-        ping_low = { file = folderPath .. "/signal-low.png", url = baseURL .. "signal-low.png" },
-        ping_med = { file = folderPath .. "/signal-medium.png", url = baseURL .. "signal-medium.png" },
-        ping_high = { file = folderPath .. "/signal-high.png", url = baseURL .. "signal-high.png" }
-    }
-
-    for _, v in pairs(assets) do
-        if not isfile(v.file) then
-            local success, response = pcall(function()
-                return game:HttpGet(v.url)
-            end)
-            if success and response then
-                writefile(v.file, response)
-            end
-        end
-    end
-
-    local function loadAsset(path)
-        if isfile(path) then
-            return getcustomasset(path)
-        else
-            return "rbxassetid://0"
-        end
-    end
 
     local logoAsset = loadAsset(assets.logo.file)
     local playerIcon = loadAsset(assets.player.file)
@@ -2713,42 +2722,6 @@ function lib:Window(text, preset, closebind)
             LabelTitle1.TextSize = 14.000
             LabelTitle1.TextXAlignment = Enum.TextXAlignment.Left
             LabelTitle1.TextTruncate = Enum.TextTruncate.AtEnd
-
-            local Label2 = Instance.new("TextButton")
-            local LabelCorner2 = Instance.new("UICorner")
-            local LabelTitle2 = Instance.new("TextLabel")
-
-            Label2.Name = "Button"
-            Label2.Parent = Tab
-            Label2.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label2.Size = UDim2.new(0, 363, 0, 42)
-            Label2.AutoButtonColor = false
-            Label2.Font = Enum.Font.SourceSans
-            Label2.Text = ""
-            Label2.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Label2.TextSize = 14.000
-
-            LabelCorner2.CornerRadius = UDim.new(0, 5)
-            LabelCorner2.Name = "ButtonCorner"
-            LabelCorner2.Parent = Label2
-
-            LabelTitle2.Name = "ButtonTitle"
-            LabelTitle2.Parent = Label2
-            LabelTitle2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle2.BackgroundTransparency = 1.000
-            LabelTitle2.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle2.Size = UDim2.new(0, 340, 0, 42)
-            LabelTitle2.Font = Enum.Font.Gotham
-            LabelTitle2.Text = ""
-            LabelTitle2.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle2.TextSize = 14.000
-            LabelTitle2.TextXAlignment = Enum.TextXAlignment.Left
-
-            game:GetService("RunService").RenderStepped:Connect(function()
-                local currentTime = DateTime.now():FormatLocalTime("h:mm:ss A", "en-us")
-                local playerCount = #game:GetService("Players"):GetPlayers() or #game:GetService("Players"):GetChildren()
-                LabelTitle2.Text = "  ・  Current Players:   " .. playerCount .. "        -        " .. currentTime
-            end)
         
             return lbl
         end
