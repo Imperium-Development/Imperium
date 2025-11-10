@@ -5,7 +5,7 @@ Powered By Imperium ♡
 
 --]]
 
-local lib = { RainbowColorValue = 0, HueSelectionPosition = 0 }
+local lib = {RainbowColorValue = 0, HueSelectionPosition = 0}
 
 local HttpService = game:GetService("HttpService")
 local UserInputService = game:GetService("UserInputService")
@@ -184,7 +184,6 @@ function lib:Window(text, preset, closebind)
     local Title = Instance.new("TextLabel")
     local TabFolder = Instance.new("Folder")
     local DragFrame = Instance.new("Frame")
-    local UICorner_hide = Instance.new("UICorner")
 
     self.Title = Title
 
@@ -241,41 +240,156 @@ function lib:Window(text, preset, closebind)
 
     MakeDraggable(DragFrame, Main)
 
-    -- [ TOGGLE MOBILE ] --
+    -- [ DYNAMIC ISLAND ] --
 
-    local OpenHideScreen = Instance.new("ScreenGui")
-    OpenHideScreen.Name = "ImperiumToggle"
-    OpenHideScreen.Parent = game.CoreGui
-    OpenHideScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    local folderPath = "Imperium_Assets"
 
-    local UIHidder = Instance.new("Frame")
-    UIHidder.Size = UDim2.new(0, 40, 0, 40)
-    UIHidder.Position = UDim2.new(0.5, -20, 0.085, 0)
-    UIHidder.BackgroundTransparency = 1
-    UIHidder.Parent = OpenHideScreen
+    if not isfolder("Imperium_Assets") then
+        makefolder("Imperium_Assets")
+    end
 
-    local BlurImage = Instance.new("ImageLabel")
-    BlurImage.Size = UDim2.new(1, 70, 1, 64)
-    BlurImage.Position = UDim2.new(-1, 5, -1, 10)
-    BlurImage.Image = "rbxassetid://8992230677"
-    BlurImage.ImageColor3 = Color3.fromRGB(30, 30, 30)
-    BlurImage.BackgroundTransparency = 1
-    BlurImage.ImageTransparency = 0.5
-    BlurImage.Parent = UIHidder
+    local baseURL = "https://raw.githubusercontent.com/Imperium-Development/Imperium/main/.assets/"
 
-    local OpenHideUI = Instance.new("ImageButton")
-    OpenHideUI.Size = UDim2.new(0, 40, 0, 40)
-    OpenHideUI.Position = UDim2.new(0, 0, 0, 0)
-    OpenHideUI.Image = "rbxassetid://71610434705093"
-    OpenHideUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    OpenHideUI.BackgroundTransparency = 0.1
-    OpenHideUI.AutoButtonColor = false
-    OpenHideUI.ZIndex = 2
-    OpenHideUI.Parent = UIHidder
+    local assets = {
+        logo = { file = folderPath .. "/imperiumicon.png", url = baseURL .. "imperiumicon.png" },
+        player = { file = folderPath .. "/user.png", url = baseURL .. "user.png" },
+        fps = { file = folderPath .. "/fps.png", url = baseURL .. "fps.png" },
+        ping_low = { file = folderPath .. "/signal-low.png", url = baseURL .. "signal-low.png" },
+        ping_med = { file = folderPath .. "/signal-medium.png", url = baseURL .. "signal-medium.png" },
+        ping_high = { file = folderPath .. "/signal-high.png", url = baseURL .. "signal-high.png" }
+    }
 
-    local UICorner_hide = Instance.new("UICorner")
-    UICorner_hide.CornerRadius = UDim.new(0.2, 0)
-    UICorner_hide.Parent = OpenHideUI
+    for _, v in pairs(assets) do
+        if not isfile(v.file) then
+            local success, response = pcall(function()
+                return game:HttpGet(v.url)
+            end)
+            if success and response then
+                writefile(v.file, response)
+            end
+        end
+    end
+
+    local function loadAsset(path)
+        if isfile(path) then
+            return getcustomasset(path)
+        else
+            return "rbxassetid://0"
+        end
+    end
+
+    local logoAsset = loadAsset(assets.logo.file)
+    local playerIcon = loadAsset(assets.player.file)
+    local fpsIcon = loadAsset(assets.fps.file)
+    local pingLowIcon = loadAsset(assets.ping_low.file)
+    local pingMedIcon = loadAsset(assets.ping_med.file)
+    local pingHighIcon = loadAsset(assets.ping_high.file)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ImperiumDynamicIsland"
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local Frame = Instance.new("Frame")
+    Frame.Name = "MainFrame"
+    Frame.Parent = ScreenGui
+    Frame.AnchorPoint = Vector2.new(0.5, 0)
+    Frame.Position = UDim2.new(0.5, 0, 0, 10)
+    Frame.Size = UDim2.new(0, 340, 0, 36)
+    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Frame.BorderSizePixel = 0
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(1, 0)
+    UICorner.Parent = Frame
+
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Thickness = 1
+    UIStroke.Transparency = 0.3
+    UIStroke.Color = Color3.fromRGB(80, 80, 85)
+    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+    UIStroke.LineJoinMode = Enum.LineJoinMode.Round
+    UIStroke.Parent = Frame
+
+    local Logo = Instance.new("ImageButton")
+    Logo.Name = "LogoButton"
+    Logo.Parent = Frame
+    Logo.AnchorPoint = Vector2.new(0, 0.5)
+    Logo.Position = UDim2.new(0, 12, 0.5, 0)
+    Logo.Size = UDim2.new(0, 27, 0, 27)
+    Logo.BackgroundTransparency = 1
+    Logo.Image = logoAsset
+
+    local StatsContainer = Instance.new("Frame")
+    StatsContainer.Name = "StatsContainer"
+    StatsContainer.Parent = Frame
+    StatsContainer.BackgroundTransparency = 1
+    StatsContainer.Position = UDim2.new(0, 48, 0, 0)
+    StatsContainer.Size = UDim2.new(1, -52, 1, 0)
+
+    local function createStatFrame(name, parent, pos, size, labelText, iconImage)
+        local frame = Instance.new("Frame")
+        frame.Name = name
+        frame.Parent = parent
+        frame.BackgroundTransparency = 1
+        frame.Position = pos
+        frame.Size = size
+
+        local icon = Instance.new("ImageLabel")
+        icon.Name = "Icon"
+        icon.Parent = frame
+        icon.BackgroundTransparency = 1
+        icon.Size = UDim2.new(0, 14, 0, 14)
+        icon.Position = UDim2.new(0, 0, 0.3, 0)
+        icon.Image = iconImage
+
+        local text = Instance.new("TextLabel")
+        text.Name = "Text"
+        text.Parent = frame
+        text.BackgroundTransparency = 1
+        text.Position = UDim2.new(0, 18, 0, 0)
+        text.Size = UDim2.new(1, -18, 1, 0)
+        text.Font = Enum.Font.GothamMedium
+        text.TextScaled = false
+        text.TextColor3 = Color3.fromRGB(213, 213, 213)
+        text.TextXAlignment = Enum.TextXAlignment.Left
+        text.TextTruncate = Enum.TextTruncate.AtEnd
+        text.Text = labelText or ""
+
+        return frame, text, icon
+    end
+
+    local PlayerStats, PlayerText = createStatFrame("PlayerStats", StatsContainer, UDim2.new(0.01, 0, 0, 0), UDim2.new(0.28, 0, 1, 0), game.Players.LocalPlayer.Name, playerIcon)
+    local FPSStats, FPSText = createStatFrame("FPSStats", StatsContainer, UDim2.new(0.4, -5, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 FPS", fpsIcon)
+    local PingStats, PingText, PingIcon = createStatFrame("PingStats", StatsContainer, UDim2.new(0.73, 0, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 MS", pingLowIcon)
+
+    local RunService = game:GetService("RunService")
+    local StatsService = game:GetService("Stats")
+    local PingValue = StatsService.Network.ServerStatsItem["Data Ping"]
+
+    local fps, frames, lastUpdate = 0, 0, tick()
+    RunService.RenderStepped:Connect(function()
+        frames += 1
+        if tick() - lastUpdate >= 1 then
+            fps = frames
+            frames = 0
+            lastUpdate = tick()
+            FPSText.Text = fps .. " FPS"
+        end
+
+        local ping = math.floor(PingValue:GetValue())
+        PingText.Text = ping .. " MS"
+
+        if ping <= 80 then
+            PingText.TextColor3 = Color3.fromRGB(133, 255, 109)
+            PingIcon.Image = pingLowIcon
+        elseif ping <= 150 then
+            PingText.TextColor3 = Color3.fromRGB(255, 255, 64)
+            PingIcon.Image = pingMedIcon
+        else
+            PingText.TextColor3 = Color3.fromRGB(255, 69, 58)
+            PingIcon.Image = pingHighIcon
+        end
+    end)
 
     local function toggleUI()
         if isGuiOpened then
@@ -290,7 +404,7 @@ function lib:Window(text, preset, closebind)
         end
     end
 
-    OpenHideUI.MouseButton1Click:Connect(function()
+    Logo.MouseButton1Click:Connect(function()
         toggleUI()
     end)
 
@@ -827,7 +941,7 @@ function lib:Window(text, preset, closebind)
         end 
 
 
-        function tabcontent:ToggleBind(text, default, keypreset, callback, externalCallback)
+        function tabcontent:ToggleBind(text, default, keypreset, callback)
             local UIS = game:GetService("UserInputService")
 
             local toggled = false
@@ -952,10 +1066,6 @@ function lib:Window(text, preset, closebind)
                 end
         
                 pcall(callback, toggled)
-
-                if externalCallback then
-                    pcall(externalCallback, toggled)
-                end
             end
         
             ToggleBtn.MouseButton1Click:Connect(function()
@@ -2546,29 +2656,21 @@ function lib:Window(text, preset, closebind)
                 local success, result = pcall(function()
                     local response = requestDiscordStatus()
                     if not response or response.StatusCode ~= 200 then
-                        return nil
+                        print("> Imperium  |  ERROR  •  Website error  |  Request failed or bad status code")
                     end
                     return response.Body
                 end)
 
-                if success and result then
-                    local ok, data = pcall(function()
-                        return HttpService:JSONDecode(result)
-                    end)
+                if success then
+                    local data = HttpService:JSONDecode(result)
 
-                    if ok and data then
-                        SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
-                        SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
-                        SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
-                    else
-                        SublabelTitle1.Text = "[Server Offline]  IMPERIUM  🦇"
-                        SublabelTitle2.Text = "? ... Online"
-                        SublabelTitle3.Text = "? ... Members"
-                    end
+                    SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
+                    SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
+                    SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
                 else
-                    SublabelTitle1.Text = "[Server Offline]  IMPERIUM  🦇"
-                    SublabelTitle2.Text = "? ... Online"
-                    SublabelTitle3.Text = "? ... Members"
+                    SublabelTitle1.Text = "IMPERIUM  🦇"
+                    SublabelTitle2.Text = "0 Online"
+                    SublabelTitle3.Text = "0 Members"
                 end
             end
 
