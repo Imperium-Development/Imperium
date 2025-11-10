@@ -290,7 +290,7 @@ function lib:Window(text, preset, closebind)
     -- [ DYNAMIC ISLAND ] --
 
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "ImperiumDynamicIsland"
+    ScreenGui.Name = "ImperiumDynamic"
     ScreenGui.Parent = game:GetService("CoreGui")
 
     local Frame = Instance.new("Frame")
@@ -300,6 +300,7 @@ function lib:Window(text, preset, closebind)
     Frame.Position = UDim2.new(0.5, 0, 0, 10)
     Frame.Size = UDim2.new(0, 340, 0, 36)
     Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Frame.BackgroundTransparency = 0.1
     Frame.BorderSizePixel = 0
 
     local UICorner = Instance.new("UICorner")
@@ -2552,7 +2553,7 @@ function lib:Window(text, preset, closebind)
             LabelDev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelDev.BackgroundTransparency = 1.000
             LabelDev.Position = UDim2.new(0.0358126722, 60, 0, 10)
-            LabelDev.Size = UDim2.new(0, 187, 0, 20)
+            LabelDev.Size = UDim2.new(0, 187, 0, 10)
             LabelDev.Font = Enum.Font.Gotham
             LabelDev.Text = "Developer"
             LabelDev.TextColor3 = Color3.fromRGB(141, 141, 141)
