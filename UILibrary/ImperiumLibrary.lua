@@ -2517,6 +2517,68 @@ function lib:Window(text, preset, closebind)
             Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
         end
 
+        -- [ CREDIT LABEL ] --
+
+        function tabcontent:CreditLabel(text)
+            local Label = Instance.new("TextButton")
+            local LabelCorner = Instance.new("UICorner")
+            local LabelDev = Instance.new("TextLabel")
+            local LabelTitle = Instance.new("TextLabel")
+            local LabelIcon = Instance.new("ImageLabel")
+            local LabelIconCorner = Instance.new("UICorner")
+
+            Label.Name = "Button"
+            Label.Parent = Tab
+            Label.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+            Label.Size = UDim2.new(0, 363, 0, 65)
+            Label.AutoButtonColor = false
+            Label.Font = Enum.Font.SourceSans
+            Label.Text = ""
+            Label.TextColor3 = Color3.fromRGB(0, 0, 0)
+            Label.TextSize = 14.000
+
+            LabelCorner.CornerRadius = UDim.new(0, 5)
+            LabelCorner.Name = "ButtonCorner"
+            LabelCorner.Parent = Label
+
+            LabelIcon.Name = "Icon"
+            LabelIcon.Parent = Label
+            LabelIcon.BackgroundTransparency = 1
+            LabelIcon.Position = UDim2.new(0, 10, 0, 8)
+            LabelIcon.Size = UDim2.new(0, 50, 0, 50)
+            LabelIcon.Image = getcustomasset("scriptowner.png")
+
+            LabelIconCorner.CornerRadius = UDim.new(0, 5)
+            LabelIconCorner.Name = "ButtonCorner"
+            LabelIconCorner.Parent = LabelIcon
+
+            LabelDev.Name = "ButtonDeveloper"
+            LabelDev.Parent = Label
+            LabelDev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            LabelDev.BackgroundTransparency = 1.000
+            LabelDev.Position = UDim2.new(0.0358126722, 60, 0, 10)
+            LabelDev.Size = UDim2.new(0, 187, 0, 20)
+            LabelDev.Font = Enum.Font.Gotham
+            LabelDev.Text = "Developer"
+            LabelDev.TextColor3 = Color3.fromRGB(141, 141, 141)
+            LabelDev.TextSize = 14.000
+            LabelDev.TextXAlignment = Enum.TextXAlignment.Left
+
+            LabelTitle.Name = "ButtonTitle"
+            LabelTitle.Parent = Label
+            LabelTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            LabelTitle.BackgroundTransparency = 1.000
+            LabelTitle.Position = UDim2.new(0.0358126722, 60, 0, 28)
+            LabelTitle.Size = UDim2.new(0, 187, 0, 20)
+            LabelTitle.Font = Enum.Font.Gotham
+            LabelTitle.Text = "@donfushii"
+            LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            LabelTitle.TextSize = 14.000
+            LabelTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+            Tab.CanvasSize = UDim2.new(0, 0, 0, TabLayout.AbsoluteContentSize.Y)
+        end
+
         -- [ MODIFIED LABEL ] --
 
         function tabcontent:ImageDiscord(callback)
