@@ -186,6 +186,7 @@ local assets = {
     logo = { file = folderPath .. "/imperiumicon.png", url = baseURL .. "imperiumicon.png" },
     script_owner = { file = folderPath .. "/scriptowner.png", url = baseURL .. "scriptowner.png" },
     player = { file = folderPath .. "/user.png", url = baseURL .. "user.png" },
+    game = { file = folderPath .. "/game.png", url = baseURL .. "game.png" },
     fps = { file = folderPath .. "/fps.png", url = baseURL .. "fps.png" },
     ping_low = { file = folderPath .. "/signal-low.png", url = baseURL .. "signal-low.png" },
     ping_med = { file = folderPath .. "/signal-medium.png", url = baseURL .. "signal-medium.png" },
@@ -214,6 +215,7 @@ end
 local logoAsset = loadAsset(assets.logo.file)
 local scriptOwner = loadAsset(assets.script_owner.file)
 local playerIcon = loadAsset(assets.player.file)
+local gameIcon = loadAsset(assets.game.file)
 local fpsIcon = loadAsset(assets.fps.file)
 local pingLowIcon = loadAsset(assets.ping_low.file)
 local pingMedIcon = loadAsset(assets.ping_med.file)
@@ -363,9 +365,10 @@ function lib:Window(text, preset, closebind)
         return frame, text, icon
     end
 
-    local PlayerStats, PlayerText = createStatFrame("PlayerStats", StatsContainer, UDim2.new(0.01, 0, 0, 0), UDim2.new(0.28, 0, 1, 0), game.Players.LocalPlayer.Name, playerIcon)
-    local FPSStats, FPSText = createStatFrame("FPSStats", StatsContainer, UDim2.new(0.4, -5, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 FPS", fpsIcon)
-    local PingStats, PingText, PingIcon = createStatFrame("PingStats", StatsContainer, UDim2.new(0.73, 0, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 MS", pingLowIcon)
+    local GameStats, GameText = createStatFrame("GameStats", StatsContainer, UDim2.new(0.01, -5, 0, 0), UDim2.new(0.28, 0, 1, 0), game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name, gameIcon)
+    local PlayerStats, PlayerText = createStatFrame("PlayerStats", StatsContainer, UDim2.new(0.01, 68, 0, 0), UDim2.new(0.28, 0, 1, 0), game.Players.LocalPlayer.Name, playerIcon)
+    local FPSStats, FPSText = createStatFrame("FPSStats", StatsContainer, UDim2.new(0.4, 35, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 FPS", fpsIcon)
+    local PingStats, PingText, PingIcon = createStatFrame("PingStats", StatsContainer, UDim2.new(0.73, 5, 0, 0), UDim2.new(0.22, 0, 1, 0), "0 MS", pingLowIcon)
 
     local RunService = game:GetService("RunService")
     local StatsService = game:GetService("Stats")
@@ -2553,11 +2556,11 @@ function lib:Window(text, preset, closebind)
             LabelDev.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             LabelDev.BackgroundTransparency = 1.000
             LabelDev.Position = UDim2.new(0.0358126722, 60, 0, 10)
-            LabelDev.Size = UDim2.new(0, 187, 0, 10)
+            LabelDev.Size = UDim2.new(0, 187, 0, 20)
             LabelDev.Font = Enum.Font.Gotham
             LabelDev.Text = "Developer"
             LabelDev.TextColor3 = Color3.fromRGB(141, 141, 141)
-            LabelDev.TextSize = 14.000
+            LabelDev.TextSize = 10.000
             LabelDev.TextXAlignment = Enum.TextXAlignment.Left
 
             LabelTitle.Name = "ButtonTitle"
@@ -2749,37 +2752,6 @@ function lib:Window(text, preset, closebind)
                     task.wait(10)
                 end
             end)
-
-            local Label1 = Instance.new("TextButton")
-            local LabelCorner1 = Instance.new("UICorner")
-            local LabelTitle1 = Instance.new("TextLabel")
-
-            Label1.Name = "Button"
-            Label1.Parent = Tab
-            Label1.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-            Label1.Size = UDim2.new(0, 363, 0, 42)
-            Label1.AutoButtonColor = false
-            Label1.Font = Enum.Font.SourceSans
-            Label1.Text = ""
-            Label1.TextColor3 = Color3.fromRGB(0, 0, 0)
-            Label1.TextSize = 14.000
-
-            LabelCorner1.CornerRadius = UDim.new(0, 5)
-            LabelCorner1.Name = "ButtonCorner"
-            LabelCorner1.Parent = Label1
-
-            LabelTitle1.Name = "ButtonTitle"
-            LabelTitle1.Parent = Label1
-            LabelTitle1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle1.BackgroundTransparency = 1.000
-            LabelTitle1.Position = UDim2.new(0.0358126722, 0, 0, 0)
-            LabelTitle1.Size = UDim2.new(0, 340, 0, 42)
-            LabelTitle1.Font = Enum.Font.Gotham
-            LabelTitle1.Text = "  ・  Game:   " .. GameName
-            LabelTitle1.TextColor3 = Color3.fromRGB(255, 255, 255)
-            LabelTitle1.TextSize = 14.000
-            LabelTitle1.TextXAlignment = Enum.TextXAlignment.Left
-            LabelTitle1.TextTruncate = Enum.TextTruncate.AtEnd
         
             return lbl
         end
