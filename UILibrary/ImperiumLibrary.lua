@@ -2822,7 +2822,7 @@ function lib:Window(text, preset, closebind)
                 local success, result = pcall(function()
                     local response = requestDiscordStatus()
                     if not response or response.StatusCode ~= 200 then
-                        print("> Imperium  |  ERROR  •  Website error  |  Request failed or bad status code")
+                        return nil
                     end
                     return response.Body
                 end)
