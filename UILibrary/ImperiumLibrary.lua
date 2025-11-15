@@ -2580,6 +2580,7 @@ function lib:Window(text, preset, closebind)
 
         function tabcontent:ImageDiscord(changelogText, callback)
             local lbl = {}
+            local invalidBuilt = false
 
             local Label = Instance.new("TextButton")
             local LabelCorner = Instance.new("UICorner")
@@ -2770,6 +2771,53 @@ function lib:Window(text, preset, closebind)
                 end
             end
 
+            local function makeInvalidUI()
+                if invalidBuilt then return end
+                invalidBuilt = true
+
+                ImageLabel.Position = UDim2.new(0, 5, 0, 40)
+                SublabelTitle1.Visible = false
+                SublabelTitle2.Visible = false
+                SublabelTitle3.Visible = false
+                OnlineCircle.Visible = false
+                OfflineCircle.Visible = false
+                JoinSubButton.Visible = false
+
+                local Inv1 = Instance.new("TextLabel")
+                Inv1.Parent = Label
+                Inv1.BackgroundTransparency = 1
+                Inv1.Position = UDim2.new(0, 20, 0, 10)
+                Inv1.Size = UDim2.new(0, 250, 0, 20)
+                Inv1.Font = Enum.Font.Gotham
+                Inv1.Text = "You sent an invite, but..."
+                Inv1.TextColor3 = Color3.fromRGB(172, 172, 172)
+                Inv1.TextSize = 14
+                Inv1.TextXAlignment = Enum.TextXAlignment.Left
+
+                local Inv2 = Instance.new("TextLabel")
+                Inv2.Parent = Label
+                Inv2.BackgroundTransparency = 1
+                Inv2.Position = UDim2.new(0.2, 10, 0, 55)
+                Inv2.Size = UDim2.new(0, 270, 0, 20)
+                Inv2.Font = Enum.Font.Gotham
+                Inv2.Text = "Invalid Invite"
+                Inv2.TextColor3 = Color3.fromRGB(255, 53, 53)
+                Inv2.TextSize = 14
+                Inv2.TextXAlignment = Enum.TextXAlignment.Left
+
+                local Inv3 = Instance.new("TextLabel")
+                Inv3.Parent = Label
+                Inv3.BackgroundTransparency = 1
+                Inv3.Position = UDim2.new(0.2, 10, 0, 65)
+                Inv3.Size = UDim2.new(0, 250, 0, 42)
+                Inv3.Font = Enum.Font.Gotham
+                Inv3.Text = "Try sending a new invite!"
+                Inv3.TextColor3 = Color3.fromRGB(172, 172, 172)
+                Inv3.TextSize = 14
+                Inv3.TextXAlignment = Enum.TextXAlignment.Left
+                Inv3.TextTruncate = Enum.TextTruncate.AtEnd
+           end
+
             local function updateDiscordStatus()
                 local success, result = pcall(function()
                     local response = requestDiscordStatus()
@@ -2779,17 +2827,21 @@ function lib:Window(text, preset, closebind)
                     return response.Body
                 end)
 
-                if success then
-                    local data = HttpService:JSONDecode(result)
-
-                    SublabelTitle1.Text = data.server_name or "IMPERIUM  🦇"
-                    SublabelTitle2.Text = (data.online and tostring(data.online) or "0") .. " Online"
-                    SublabelTitle3.Text = (data.members and tostring(data.members) or "0") .. " Members"
-                else
-                    SublabelTitle1.Text = "IMPERIUM  🦇"
-                    SublabelTitle2.Text = "0 Online"
-                    SublabelTitle3.Text = "0 Members"
+                if not success or not result then
+                    makeInvalidUI()
+                    return
                 end
+
+                local data = HttpService:JSONDecode(result)
+
+                if not data or not data.server_name then
+                    makeInvalidUI()
+                    return
+                end
+
+                SublabelTitle1.Text = data.server_name
+                SublabelTitle2.Text = tostring(data.online or 0) .. " Online"
+                SublabelTitle3.Text = tostring(data.members or 0) .. " Members"
             end
 
             updateDiscordStatus()
