@@ -2844,7 +2844,11 @@ function lib:Window(text, preset, closebind)
                 SublabelTitle3.Text = tostring(data.members or 0) .. " Members"
             end
 
-            updateDiscordStatus()
+            --updateDiscordStatus()
+
+            task.defer(function()
+                updateDiscordStatus()
+            end)
 
             task.spawn(function()
                 while true do
