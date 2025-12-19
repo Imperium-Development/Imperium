@@ -18,7 +18,7 @@
     <a href="#-what-is-imperium">WHAT IS</a> •
 	<a href="#-script">SCRIPT</a> •
 	<a href="#-premium">PREMIUM</a> •
-	<a href="https://discord.com/users/866057144944033802">DISCORD</a>
+	<a href="https://imperiumhub.pages.dev/home/" target="_blank">WEBSITE</a>
 </p>
 <br/>
 
