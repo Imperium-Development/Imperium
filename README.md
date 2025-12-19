@@ -73,7 +73,7 @@ This project also includes libraries created by the same author and released sep
 
 ]]--
 
->  loadstring(game:HttpGet("https://raw.githubusercontent.com/Imperium-Development/Imperium/main/Imperium.lua"))()
+>  loadstring(game:HttpGet('https://imperiumhub.pages.dev/imperium'))()
 ```
 
 <div align="center">
