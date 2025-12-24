@@ -30,14 +30,13 @@
 You MAY:
 
 ```
-• Redistribute the script only in its original, unmodified form.
+• Redistribute the script only in its original, unmodified, official loadstring.
 ```
 
 You may NOT:
 
 ```
 • Modify or deobfuscate the script.
-• Sell, monetize, or paywall it.
 • Claim authorship or remove credits.
 • Re-upload edited or altered versions.
 ```
